@@ -162,6 +162,7 @@ def get_router_ip(interface: str = "wlan0") -> Optional[str]:
         Router IP address or None if not found
     """
     try:
+        # First try to get default route for specific interface
         result = subprocess.run(
             ["ip", "route", "show", "default", "dev", interface],
             capture_output=True,
@@ -173,6 +174,36 @@ def get_router_ip(interface: str = "wlan0") -> Optional[str]:
         match = re.search(r'default via ([\d.]+)', result.stdout)
         if match:
             return match.group(1)
+
+        # If no default route, try to get gateway from interface's network config
+        result = subprocess.run(
+            ["ip", "route", "show", "dev", interface],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+
+        # Look for any route with via (gateway)
+        for line in result.stdout.split('\n'):
+            if 'via' in line:
+                match = re.search(r'via ([\d.]+)', line)
+                if match:
+                    return match.group(1)
+
+        # Try getting from all routes and filter by interface
+        result = subprocess.run(
+            ["ip", "route"],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+
+        for line in result.stdout.split('\n'):
+            if interface in line and 'default via' in line:
+                match = re.search(r'default via ([\d.]+)', line)
+                if match:
+                    return match.group(1)
+
     except Exception as e:
         print(f"Error getting router IP for {interface}: {e}")
 
@@ -200,36 +231,3 @@ def get_router_mac(interface: str = "wlan0") -> Optional[str]:
         print(f"Error getting router MAC: {e}")
 
     return None
-
-
-# Example usage
-if __name__ == "__main__":
-    print("=== Network Tools Demo ===\n")
-
-    # Get local network info
-    print(f"Local IP: {get_local_ip()}")
-    print(f"Network Range: {get_network_range()}\n")
-
-    # Scan network
-    print("Scanning network for active IPs...")
-    active_ips = scan_network()
-    print(f"\nFound {len(active_ips)} active IPs:")
-    for ip in active_ips:
-        print(f"  - {ip}")
-
-    # Get MAC addresses
-    print("\n--- MAC Address Lookups ---")
-
-    # Get wlan0 MAC
-    wlan_mac = get_adapter_mac("wlan0")
-    print(f"wlan0 MAC: {wlan_mac}")
-
-    # Get router MAC
-    router_mac = get_router_mac()
-    print(f"Router MAC: {router_mac}")
-
-    # Get MAC for first active IP (if any)
-    if active_ips:
-        test_ip = active_ips[0]
-        mac = get_mac_address(test_ip)
-        print(f"MAC for {test_ip}: {mac}")
