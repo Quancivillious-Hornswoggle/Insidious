@@ -5,8 +5,7 @@ and then proceeds to run and pass other arguments to needed python
 program
 """
 
-import socket, mitm, server
-
+import socket
 
 """
 Initialize server to accept connection and then handle it
