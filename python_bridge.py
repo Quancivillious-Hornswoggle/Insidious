@@ -6,13 +6,12 @@ program
 """
 
 import socket, threading, time
-
 from Modules import wifi_brute, deauth, mitm, dns, server, packet_capture
 
-"""
-This method is just to try to ensure a safe shutdown
-"""
 def _safe_shutdown(sock):
+    """
+    This method is just to try to ensure a safe shutdown
+    """
     if not sock:
         return
     try:
@@ -24,10 +23,10 @@ def _safe_shutdown(sock):
     except Exception:
         pass
 
-"""
-Initialize server to accept connection and then handle it
-"""
 def init_server():
+    """
+    Initialize server to accept connection and then handle it
+    """
     # Run in loop in case error happened
     while True:
         server_socket = None
@@ -65,10 +64,10 @@ def init_server():
             # make sure the socket is released on any exit from try
             _safe_shutdown(server_socket)
 
-"""
-Main method that handles the bridge
-"""
 def main(ss, ms):
+    """
+    Main method that handles the bridge
+    """
     print("Initializing modules/threads")
     # Initialize all modules within a thread
     module_threads = []

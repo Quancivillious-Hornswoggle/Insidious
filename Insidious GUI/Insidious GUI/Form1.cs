@@ -7,6 +7,10 @@ namespace Insidious_GUI
     {
         private TcpClient bridge;
 
+        // Windows
+
+        Deauth deauthWindow = null;
+
         public Form1()
         {
             InitializeComponent();
@@ -34,7 +38,7 @@ namespace Insidious_GUI
             {
                 try
                 {
-                    bridge = new TcpClient("10.0.2.15", 65535);
+                    bridge = new TcpClient("172.16.105.1", 65535);
                     Debug.WriteLine("Connected!");
                 }
                 catch
@@ -43,6 +47,44 @@ namespace Insidious_GUI
                     Thread.Sleep(1000); // wait 1 second before retry
                 }
             }
+
+        }
+
+        private void wifiBruteButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void wifiDeauthButton_Click(object sender, EventArgs e)
+        {
+            if (deauthWindow == null || deauthWindow.IsDisposed)
+            {
+                deauthWindow = new Deauth();
+                deauthWindow.Show();
+            }
+            else
+            {
+                deauthWindow.BringToFront();
+            }
+        }
+
+        private void dnsSpoofButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void serverHostButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void mitmButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void packetCaptureButton_Click(object sender, EventArgs e)
+        {
 
         }
     }
