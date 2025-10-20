@@ -50,7 +50,7 @@ def init_server():
             server_socket.close()
             main_socket.close()
             print("Closed connections")
-            time.sleep(1) 
+            time.sleep(1)
             return
         except KeyboardInterrupt:
             try:

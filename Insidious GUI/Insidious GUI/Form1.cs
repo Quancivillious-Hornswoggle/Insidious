@@ -25,16 +25,16 @@ namespace Insidious_GUI
                 CreateNoWindow = false      // hide the terminal
             };
 
-            Process.Start(psi);
+            //Process.Start(psi);
 
-            Debug.WriteLine("Bridge Started");
+            //Debug.WriteLine("Bridge Started");
 
             // Connect to bridge
             while (bridge == null)
             {
                 try
                 {
-                    bridge = new TcpClient("127.0.0.1", 65535);
+                    bridge = new TcpClient("10.0.2.15", 65535);
                     Debug.WriteLine("Connected!");
                 }
                 catch
