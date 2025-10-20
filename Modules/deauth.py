@@ -7,7 +7,7 @@ def init(host_socket):
     pass
 
 def run(cmd):
-    target_mac = nt.get_mac_address("10.10.26.67")
+    target_mac = nt.get_mac_address("10.10.26.8")
     router_mac = nt.get_router_mac()
     while True:
 
