@@ -25,7 +25,22 @@ def init_server():
     main(server_socket, main_socket)
 
 def main(ss, ms):
-    pass
+    # Create continuous loop
+    while True:
+        cmd = ms.recv(1024)
+
+        match cmd:
+            case 1:
+                pass
+            case 2:
+                pass
+            case 3:
+                pass
+            case 'X':
+                ms.close()
+                ss.close()
+                return
+
 
 if __name__ == "__main__":
     init_server()
