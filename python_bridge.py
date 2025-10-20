@@ -7,6 +7,8 @@ program
 
 import socket
 
+from Modules import wifi_brute, deauth, mitm, dns, server, packet_capture as m
+
 """
 Initialize server to accept connection and then handle it
 """
