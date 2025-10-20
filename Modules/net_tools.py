@@ -86,45 +86,84 @@ def scan_network(network_range: Optional[str] = None, max_workers: int = 50) -> 
     return active_ips
 
 
-def get_mac_address(ip: str) -> Optional[str]:
+def get_mac_address(ip: str, retries: int = 3) -> Optional[str]:
     """
     Get the MAC address for a specified IP address
 
     Args:
         ip: IP address to lookup
+        retries: Number of times to retry pinging/checking ARP
 
     Returns:
         MAC address string or None if not found
     """
-    try:
-        # First, ping the IP to ensure it's in the ARP cache
-        subprocess.run(
-            ["ping", "-c", "1", "-W", "1", ip],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=2
-        )
+    for attempt in range(retries):
+        try:
+            # Ping the IP to ensure it's in the ARP cache
+            subprocess.run(
+                ["ping", "-c", "1", "-W", "2", ip],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=3
+            )
 
-        # Read the ARP cache
-        result = subprocess.run(
-            ["arp", "-n", ip],
-            capture_output=True,
-            text=True,
-            timeout=2
-        )
+            # Small delay to let ARP cache update
+            import time
+            time.sleep(0.2)
 
-        # Parse the output for MAC address
-        # Format: Address HWtype HWaddress Flags Mask Iface
-        lines = result.stdout.split('\n')
-        for line in lines:
-            if ip in line:
-                # Match MAC address pattern
-                mac_match = re.search(r'([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}', line)
-                if mac_match:
-                    return mac_match.group(0).lower()
-    except Exception as e:
-        print(f"Error getting MAC for {ip}: {e}")
+            # Try method 1: arp -n command
+            result = subprocess.run(
+                ["arp", "-n", ip],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
 
+            # Parse the output for MAC address
+            lines = result.stdout.split('\n')
+            for line in lines:
+                if ip in line:
+                    # Match MAC address pattern
+                    mac_match = re.search(r'([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}', line)
+                    if mac_match:
+                        mac = mac_match.group(0).lower()
+                        # Make sure it's not incomplete (not all zeros or incomplete)
+                        if mac != "00:00:00:00:00:00" and "incomplete" not in line.lower():
+                            return mac
+
+            # Try method 2: ip neigh command
+            result = subprocess.run(
+                ["ip", "neigh", "show", ip],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+
+            # Look for MAC in output
+            mac_match = re.search(r'([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}', result.stdout)
+            if mac_match and "FAILED" not in result.stdout and "INCOMPLETE" not in result.stdout:
+                return mac_match.group(0).lower()
+
+            # Try method 3: Read /proc/net/arp
+            try:
+                with open('/proc/net/arp', 'r') as f:
+                    for line in f:
+                        if ip in line:
+                            parts = line.split()
+                            if len(parts) >= 4:
+                                mac = parts[3].lower()
+                                if mac != "00:00:00:00:00:00" and len(mac) == 17:
+                                    return mac
+            except Exception:
+                pass
+
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt < retries - 1:
+                import time
+                time.sleep(0.5)
+
+    print(f"Could not resolve MAC address for {ip} after {retries} attempts")
     return None
 
 
@@ -231,3 +270,36 @@ def get_router_mac(interface: str = "wlan0") -> Optional[str]:
         print(f"Error getting router MAC: {e}")
 
     return None
+
+
+# Example usage
+if __name__ == "__main__":
+    print("=== Network Tools Demo ===\n")
+
+    # Get local network info
+    print(f"Local IP: {get_local_ip()}")
+    print(f"Network Range: {get_network_range()}\n")
+
+    # Scan network
+    print("Scanning network for active IPs...")
+    active_ips = scan_network()
+    print(f"\nFound {len(active_ips)} active IPs:")
+    for ip in active_ips:
+        print(f"  - {ip}")
+
+    # Get MAC addresses
+    print("\n--- MAC Address Lookups ---")
+
+    # Get wlan0 MAC
+    wlan_mac = get_adapter_mac("wlan0")
+    print(f"wlan0 MAC: {wlan_mac}")
+
+    # Get router MAC
+    router_mac = get_router_mac()
+    print(f"Router MAC: {router_mac}")
+
+    # Get MAC for first active IP (if any)
+    if active_ips:
+        test_ip = active_ips[0]
+        mac = get_mac_address(test_ip)
+        print(f"MAC for {test_ip}: {mac}")
