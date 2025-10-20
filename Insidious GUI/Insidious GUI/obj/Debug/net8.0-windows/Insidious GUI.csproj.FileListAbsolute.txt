@@ -1,0 +1,17 @@
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\bin\Debug\net8.0-windows\Insidious GUI.exe
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\bin\Debug\net8.0-windows\Insidious GUI.deps.json
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\bin\Debug\net8.0-windows\Insidious GUI.runtimeconfig.json
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\bin\Debug\net8.0-windows\Insidious GUI.dll
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\bin\Debug\net8.0-windows\Insidious GUI.pdb
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious_GUI.Form1.resources
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.csproj.GenerateResource.cache
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.AssemblyInfoInputs.cache
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.AssemblyInfo.cs
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.csproj.CoreCompileInputs.cache
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.sourcelink.json
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.dll
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\refint\Insidious GUI.dll
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.pdb
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious GUI.genruntimeconfig.cache
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\ref\Insidious GUI.dll
