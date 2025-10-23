@@ -168,7 +168,7 @@
             panel3.BackColor = Color.DimGray;
             panel3.Controls.Add(label3);
             panel3.Controls.Add(dnsSpoofButton);
-            panel3.Location = new Point(344, 248);
+            panel3.Location = new Point(666, 246);
             panel3.Name = "panel3";
             panel3.Size = new Size(291, 179);
             panel3.TabIndex = 10;
@@ -204,7 +204,7 @@
             panel4.BackColor = Color.DimGray;
             panel4.Controls.Add(label4);
             panel4.Controls.Add(serverHostButton);
-            panel4.Location = new Point(666, 248);
+            panel4.Location = new Point(344, 455);
             panel4.Name = "panel4";
             panel4.Size = new Size(291, 179);
             panel4.TabIndex = 11;
@@ -240,7 +240,7 @@
             panel5.BackColor = Color.DimGray;
             panel5.Controls.Add(label5);
             panel5.Controls.Add(mitmButton);
-            panel5.Location = new Point(347, 455);
+            panel5.Location = new Point(344, 246);
             panel5.Name = "panel5";
             panel5.Size = new Size(291, 179);
             panel5.TabIndex = 11;

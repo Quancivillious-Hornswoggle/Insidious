@@ -5,11 +5,12 @@ namespace Insidious_GUI
 {
     public partial class Form1 : Form
     {
-        private TcpClient bridge;
+        public static TcpClient bridge;
 
         // Windows
 
         Deauth deauthWindow = null;
+        Mitm mitm = null;
 
         public Form1()
         {
@@ -19,19 +20,7 @@ namespace Insidious_GUI
         private void Form1_Load(object sender, EventArgs e)
         {
             // Run python bridge and then connect to it
-            Debug.WriteLine("Starting Bridge");
-
-            var psi = new ProcessStartInfo
-            {
-                FileName = "python",
-                Arguments = @"..\..\..\..\..\python_bridge.py",
-                UseShellExecute = false,   // required to hide window
-                CreateNoWindow = false      // hide the terminal
-            };
-
-            //Process.Start(psi);
-
-            //Debug.WriteLine("Bridge Started");
+            Debug.WriteLine("Connecting To Bridge");
 
             // Connect to bridge
             while (bridge == null)
@@ -80,7 +69,15 @@ namespace Insidious_GUI
 
         private void mitmButton_Click(object sender, EventArgs e)
         {
-
+            if (mitm == null || mitm.IsDisposed)
+            {
+                mitm = new Mitm();
+                mitm.Show();
+            }
+            else
+            {
+                mitm.BringToFront();
+            }
         }
 
         private void packetCaptureButton_Click(object sender, EventArgs e)

@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace Insidious_GUI
 {
-    public partial class Deauth: Form
+    public partial class Mitm: Form
     {
-        public Deauth()
+        public Mitm()
         {
             InitializeComponent();
         }

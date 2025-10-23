@@ -4,7 +4,7 @@ This runs a local server to be connected to by the C# program
 and then proceeds to run and pass other arguments to needed python
 program
 """
-
+import cmd
 import socket, threading, time
 from Modules import wifi_brute, deauth, mitm, dns, server, packet_capture
 
@@ -85,12 +85,13 @@ def main(ss, ms):
             print(str(cmd))
             rtn_msg = None
 
+            selection = cmd.split("-")
             # Run the command specified
-            match cmd:
+            match cmd[0]:
                 case 1:
                     pass
                 case 2:
-                    pass
+                    deauth.run(cmd[1])
                 case 3:
                     pass
                 case 4:
