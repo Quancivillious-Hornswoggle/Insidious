@@ -73,3 +73,6 @@ def scan_for_ap():
 
 
 scan_for_ap()
+nets = scan_for_ap()
+for net in nets:
+    print(net["ssid"], net["bssid"], net["signal"])
