@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
 """
 Network Tools Module
 Provides functions for network scanning and MAC address retrieval
 """
 
 import socket
-import struct
 import subprocess
 import re
 import ipaddress
