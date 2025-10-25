@@ -109,24 +109,24 @@ namespace Insidious_GUI
 
         private async void startPoisonButton_Click(object sender, EventArgs e)
         {
-            // TODO: Get target IP and gateway IP from text boxes
-            string targetIp = "192.168.1.100"; // Replace with actual input: targetIpTextBox.Text
-            string gatewayIp = "192.168.1.1"; // Replace with actual input: gatewayIpTextBox.Text
-
-            if (string.IsNullOrEmpty(targetIp) || string.IsNullOrEmpty(gatewayIp))
-            {
-                MessageBox.Show("Please enter both target IP and gateway IP", "Input Required");
-                return;
-            }
-
             if (isPoisoning)
             {
                 MessageBox.Show("MITM attack already in progress", "Info");
                 return;
             }
 
+            // TODO: Get target IP and gateway IP from your UI controls
+            string targetIp = "192.168.1.100"; // Replace with actual input
+            string gatewayIp = "192.168.1.1"; // Replace with actual input
+
+            if (string.IsNullOrEmpty(targetIp) || string.IsNullOrEmpty(gatewayIp))
+            {
+                MessageBox.Show("Please enter target IP and gateway IP", "Info");
+                return;
+            }
+
             var result = MessageBox.Show(
-                $"Start ARP poisoning attack?\nTarget: {targetIp}\nGateway: {gatewayIp}",
+                $"Start MITM attack?\nTarget: {targetIp}\nGateway: {gatewayIp}",
                 "Confirm Attack",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning
@@ -146,11 +146,9 @@ namespace Insidious_GUI
                     
                     await Form1.Bridge.SendCommandAsync("mitm", "start_poison", data);
                     
-                    MessageBox.Show("MITM attack started", "Success");
+                    MessageBox.Show("MITM attack started", "Info");
                     
                     // TODO: Disable start button, enable stop button
-                    // startPoisonButton.Enabled = false;
-                    // stopPoisonButton.Enabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -172,9 +170,6 @@ namespace Insidious_GUI
             {
                 await Form1.Bridge.SendCommandAsync("mitm", "stop_poison");
                 MessageBox.Show("Stopping MITM attack...", "Info");
-                
-                // TODO: Disable stop button
-                // stopPoisonButton.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -186,19 +181,18 @@ namespace Insidious_GUI
         {
             try
             {
-                // Send command and wait for response
-                var response = await Form1.Bridge.SendCommandAsync("mitm", "get_status", null, waitForResponse: true);
+                // Use waitForResponse to get immediate status
+                var response = await Form1.Bridge.SendCommandAsync("mitm", "get_status", waitForResponse: true);
                 
                 var json = JsonSerializer.Serialize(response.data);
                 var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
                 
-                // Display status
                 string status = $"MITM Module Status:\n\n";
-                status += $"Is Poisoning: {data.GetValueOrDefault("is_poisoning", false)}\n";
-                status += $"Target IP: {data.GetValueOrDefault("target_ip", "N/A")}\n";
-                status += $"Gateway IP: {data.GetValueOrDefault("gateway_ip", "N/A")}\n";
-                status += $"Packets Captured: {data.GetValueOrDefault("packets_captured", 0)}\n";
-                status += $"Adapter Mode: {data.GetValueOrDefault("adapter_mode", "unknown")}";
+                status += $"Is Poisoning: {data["is_poisoning"]}\n";
+                status += $"Target IP: {data["target_ip"]}\n";
+                status += $"Gateway IP: {data["gateway_ip"]}\n";
+                status += $"Packets Captured: {data["packets_captured"]}\n";
+                status += $"Adapter Mode: {data["adapter_mode"]}\n";
                 
                 MessageBox.Show(status, "Module Status");
             }

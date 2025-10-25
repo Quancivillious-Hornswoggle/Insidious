@@ -2,7 +2,6 @@
 This module stores data on the network adapter and provides methods to manage it.
 """
 
-import net_tools as adapter
 import subprocess, shlex
 
 # ADAPTER DATA
