@@ -4,9 +4,18 @@ This runs a local server to be connected to by the C# program
 and then proceeds to run and pass other arguments to needed python
 program
 """
-import cmd
-import socket, threading, time
-from Modules import wifi_brute, deauth, mitm, dns, server, packet_capture
+
+import socket
+import threading
+import time
+import sys
+import os
+
+# Add Modules directory to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Modules'))
+
+from Modules.message_broker import get_broker
+from Modules import deauth, mitm, dns, server, packet_capture, wifi_brute
 
 def _safe_shutdown(sock):
     """
@@ -40,9 +49,13 @@ def init_server():
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             # Only accept 1 connection
             server_socket.listen(1)
+            print(f"Server listening on {host}:{port}")
+            
             # Start listening for host (should be nearly instant)
             main_socket, addr = server_socket.accept()
-            # Once connected handle that John
+            print(f"Connection accepted from {addr}")
+            
+            # Once connected handle that connection
             main(server_socket, main_socket)
 
             # Close connections
@@ -58,7 +71,7 @@ def init_server():
                 print(e)
             return
         except Exception as e:
-            print(e)
+            print(f"Server error: {e}")
             time.sleep(1)
         finally:
             # make sure the socket is released on any exit from try
@@ -66,52 +79,74 @@ def init_server():
 
 def main(ss, ms):
     """
-    Main method that handles the bridge
+    Main method that handles the bridge using message broker pattern
     """
-    print("Initializing modules/threads")
-    # Initialize all modules within a thread
-    module_threads = []
-    for mod in (wifi_brute, deauth, mitm, dns, server, packet_capture):
-        t = threading.Thread(target=mod.init, args=(ms,), daemon=True)
-        module_threads.append(t)
-        t.start()
-    print("Ready")
-
-    # Create continuous loop
-    while True:
+    print("Initializing message broker and modules...")
+    
+    try:
+        # Get the message broker
+        broker = get_broker()
+        
+        # Initialize all module instances
+        modules = {
+            'deauth': deauth.get_module(),
+            'mitm': mitm.get_module(),
+            # Add other modules as they're converted:
+            # 'dns': dns.get_module(),
+            # 'server': server.get_module(),
+            # 'packet_capture': packet_capture.get_module(),
+            # 'wifi_brute': wifi_brute.get_module(),
+        }
+        
+        # Start all modules
+        for name, module in modules.items():
+            module.start()
+            print(f"Started module: {name}")
+        
+        # Start the message broker with the socket
+        broker.start(ms)
+        
+        print("=" * 50)
+        print("Bridge is ready and listening for commands!")
+        print("=" * 50)
+        
+        # Keep main thread alive and monitor connection
+        while True:
+            # Check if socket is still connected
+            try:
+                # Send keepalive or just sleep
+                time.sleep(5)
+                
+                # You could periodically check socket health here
+                # For now, just keep running
+                
+            except KeyboardInterrupt:
+                print("\nShutting down...")
+                break
+            except Exception as e:
+                print(f"Main loop error: {e}")
+                break
+        
+    except Exception as e:
+        print(f"Fatal error: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        # Cleanup
+        print("Cleaning up...")
+        
+        # Stop all modules
+        for name, module in modules.items():
+            try:
+                module.stop()
+            except Exception as e:
+                print(f"Error stopping {name}: {e}")
+        
+        # Stop broker
         try:
-            # Receive a command from the main host
-            cmd = ms.recv(1024)
-            print(str(cmd))
-            rtn_msg = None
-
-            selection = cmd.split("-")
-            # Run the command specified
-            match cmd[0]:
-                case 1:
-                    pass
-                case 2:
-                    deauth.run(cmd[1])
-                case 3:
-                    pass
-                case 4:
-                    pass
-                case 5:
-                    pass
-                case 6:
-                    pass
-                case 'X':
-                    ms.close()
-                    ss.close()
-                    rtn_msg = "Stopped modules."
-                    return
-                case _:
-                    rtn_msg = "Error running command. ???"
-        except ConnectionResetError:
-            return
-
-        # Send return message if one
-        ms.send(rtn_msg.encode('utf-8'))
+            broker.stop()
+        except Exception as e:
+            print(f"Error stopping broker: {e}")
 
 if __name__ == "__main__":
     init_server()
