@@ -3,6 +3,11 @@ Base Module Class - All modules should inherit from this
 Provides common functionality for message handling and communication
 """
 
+import sys
+import os
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(__file__))
+
 import queue
 import threading
 from abc import ABC, abstractmethod

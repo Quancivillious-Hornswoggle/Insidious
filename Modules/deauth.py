@@ -3,9 +3,13 @@ Network Deauthentication Module
 Deauthenticates specified or all clients on a network
 """
 
-from .Network_Modules import network_adapter as iface
-from .base_module import BaseModule
-from .message_broker import Message
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
+from Network_Modules import network_adapter as iface
+from base_module import BaseModule
+from message_broker import Message
 import time
 import threading
 

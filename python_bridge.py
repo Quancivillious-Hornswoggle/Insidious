@@ -13,9 +13,6 @@ import os
 # Add Modules directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Modules'))
 
-from Modules.message_broker import get_broker
-from Modules import deauth, mitm, dns, server, packet_capture, wifi_brute
-
 def _safe_shutdown(sock):
     """
     This method is just to try to ensure a safe shutdown
@@ -71,6 +68,8 @@ def init_server():
             return
         except Exception as e:
             print(f"Server error: {e}")
+            import traceback
+            traceback.print_exc()
             time.sleep(1)
         finally:
             # make sure the socket is released on any exit from try
@@ -80,44 +79,94 @@ def main(ss, ms):
     """
     Main method that handles the bridge using message broker pattern
     """
+    print("\n" + "="*60)
     print("Initializing message broker and modules...")
+    print("="*60)
+    
+    modules = {}
+    broker = None
     
     try:
-        # Get the message broker
+        # STEP 1: Import the broker (but don't start it yet)
+        print("\n[1] Importing message broker...")
+        from Modules.message_broker import get_broker
         broker = get_broker()
+        print("    ✓ Broker instance created")
         
-        # Initialize all module instances
-        modules = {
-            'deauth': deauth.get_module(),
-            'mitm': mitm.get_module(),
-            #'dns' : dns.get_module(),
-            # 'server': server.get_module(),
-            # 'packet_capture': packet_capture.get_module(),
-            # 'wifi_brute': wifi_brute.get_module(),
-        }
+        # STEP 2: Import module classes
+        print("\n[2] Importing module classes...")
+        try:
+            from Modules import deauth
+            print("    ✓ deauth imported")
+        except Exception as e:
+            print(f"    ✗ deauth import failed: {e}")
+            import traceback
+            traceback.print_exc()
         
-        # Start all modules
+        try:
+            from Modules import mitm
+            print("    ✓ mitm imported")
+        except Exception as e:
+            print(f"    ✗ mitm import failed: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        # STEP 3: Create module instances (this registers them)
+        print("\n[3] Creating module instances...")
+        
+        try:
+            deauth_mod = deauth.get_module()
+            modules['deauth'] = deauth_mod
+            print(f"    ✓ deauth module created: {deauth_mod.module_name}")
+        except Exception as e:
+            print(f"    ✗ Failed to create deauth module: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        try:
+            mitm_mod = mitm.get_module()
+            modules['mitm'] = mitm_mod
+            print(f"    ✓ mitm module created: {mitm_mod.module_name}")
+        except Exception as e:
+            print(f"    ✗ Failed to create mitm module: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        # STEP 4: Verify registration
+        print("\n[4] Verifying broker registration...")
+        print(f"    Registered modules: {list(broker.module_queues.keys())}")
+        
+        if len(broker.module_queues) == 0:
+            print("    ✗✗✗ ERROR: No modules registered! ✗✗✗")
+            print("    Check the error messages above for import failures")
+            return
+        else:
+            print(f"    ✓ {len(broker.module_queues)} module(s) registered successfully")
+        
+        # STEP 5: Start modules
+        print("\n[5] Starting modules...")
         for name, module in modules.items():
-            module.start()
-            print(f"Started module: {name}")
+            try:
+                module.start()
+                print(f"    ✓ Started module: {name}")
+            except Exception as e:
+                print(f"    ✗ Failed to start {name}: {e}")
         
-        # Start the message broker with the socket
+        # STEP 6: Start broker
+        print("\n[6] Starting message broker...")
         broker.start(ms)
+        print("    ✓ Broker started and listening")
         
-        print("=" * 50)
-        print("Bridge is ready and listening for commands!")
-        print("=" * 50)
+        print("\n" + "="*60)
+        print("✓ Bridge is ready and listening for commands!")
+        print("="*60)
+        print(f"\nActive modules: {list(modules.keys())}")
+        print("Waiting for commands from C#...\n")
         
         # Keep main thread alive and monitor connection
         while True:
-            # Check if socket is still connected
             try:
-                # Send keepalive or just sleep
                 time.sleep(5)
-                
-                # You could periodically check socket health here
-                # For now, just keep running
-                
             except KeyboardInterrupt:
                 print("\nShutting down...")
                 break
@@ -126,25 +175,28 @@ def main(ss, ms):
                 break
         
     except Exception as e:
-        print(f"Fatal error: {e}")
+        print(f"\n✗✗✗ FATAL ERROR: {e}")
         import traceback
         traceback.print_exc()
     finally:
         # Cleanup
-        print("Cleaning up...")
+        print("\nCleaning up...")
         
         # Stop all modules
         for name, module in modules.items():
             try:
                 module.stop()
+                print(f"Stopped {name}")
             except Exception as e:
                 print(f"Error stopping {name}: {e}")
         
         # Stop broker
-        try:
-            broker.stop()
-        except Exception as e:
-            print(f"Error stopping broker: {e}")
+        if broker:
+            try:
+                broker.stop()
+                print("Stopped broker")
+            except Exception as e:
+                print(f"Error stopping broker: {e}")
 
 if __name__ == "__main__":
     init_server()
