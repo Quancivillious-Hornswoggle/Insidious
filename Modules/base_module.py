@@ -5,14 +5,26 @@ Provides common functionality for message handling and communication
 
 import sys
 import os
-# Add current directory to path for imports
-sys.path.insert(0, os.path.dirname(__file__))
+# Ensure Modules directory is in path
+modules_dir = os.path.dirname(os.path.abspath(__file__))
+if modules_dir not in sys.path:
+    sys.path.insert(0, modules_dir)
+# Also add parent directory so we can import as Modules.message_broker
+parent_dir = os.path.dirname(modules_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 import queue
 import threading
 from abc import ABC, abstractmethod
 from typing import Callable, Dict
-from message_broker import *
+
+# Import using full path to ensure singleton works
+try:
+    from Modules.message_broker import Message, MessageType, get_broker
+except ImportError:
+    # Fallback for direct execution
+    from message_broker import Message, MessageType, get_broker
 
 class BaseModule(ABC):
     """

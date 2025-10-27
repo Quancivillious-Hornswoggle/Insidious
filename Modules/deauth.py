@@ -5,11 +5,24 @@ Deauthenticates specified or all clients on a network
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
+# Ensure proper import paths
+modules_dir = os.path.dirname(os.path.abspath(__file__))
+if modules_dir not in sys.path:
+    sys.path.insert(0, modules_dir)
+parent_dir = os.path.dirname(modules_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
-from Network_Modules import network_adapter as iface
-from base_module import BaseModule
-from message_broker import Message
+# Import with full path for singleton consistency
+try:
+    from Modules.Network_Modules import network_adapter as iface
+    from Modules.base_module import BaseModule
+    from Modules.message_broker import Message
+except ImportError:
+    from Network_Modules import network_adapter as iface
+    from base_module import BaseModule
+    from message_broker import Message
+
 import time
 import threading
 
