@@ -92,13 +92,25 @@ class MessageBroker:
         with self.lock:
             if module_name not in self.module_queues:
                 self.module_queues[module_name] = queue.Queue()
-                print(f"[Broker] Registered module: {module_name}")
+                print(f"[Broker] ✓ Registered module: '{module_name}'")
+            else:
+                print(f"[Broker] ⚠ Module '{module_name}' already registered")
             return self.module_queues[module_name]
+    
+    def list_registered_modules(self):
+        """Debug method to list all registered modules"""
+        with self.lock:
+            print(f"[Broker] Registered modules: {list(self.module_queues.keys())}")
+            return list(self.module_queues.keys())
     
     def start(self, sock):
         """Start the broker with the given socket"""
         self.socket = sock
         self.running = True
+        
+        # List registered modules before starting
+        print("[Broker] Starting broker...")
+        self.list_registered_modules()
         
         # Start receiving thread
         self.receive_thread = threading.Thread(target=self._receive_loop, daemon=True)
@@ -108,7 +120,7 @@ class MessageBroker:
         self.send_thread = threading.Thread(target=self._send_loop, daemon=True)
         self.send_thread.start()
         
-        print("[Broker] Message broker started")
+        print("[Broker] ✓ Message broker started successfully")
     
     def stop(self):
         """Stop the broker"""
@@ -149,29 +161,49 @@ class MessageBroker:
     def _route_message(self, raw_message: str):
         """Route incoming message to appropriate module queue"""
         try:
+            # Parse the message
             message = Message.from_json(raw_message)
             
+            print(f"[Broker] ← Received: {message.type.value} for '{message.module}'.{message.action}")
+            
             with self.lock:
+                # Check if module exists
                 if message.module in self.module_queues:
                     self.module_queues[message.module].put(message)
-                    print(f"[Broker] Routed {message.action} to {message.module}")
+                    print(f"[Broker] ✓ Routed to '{message.module}' (queue size: {self.module_queues[message.module].qsize()})")
                 else:
-                    print(f"[Broker] ERROR: Unknown module: {message.module}")
-                    print(f"[Broker] Available modules: {list(self.module_queues.keys())}")
+                    print(f"[Broker] ✗ ERROR: Module '{message.module}' not found!")
+                    print(f"[Broker]   Available modules: {list(self.module_queues.keys())}")
+                    print(f"[Broker]   Incoming module name: '{message.module}' (length: {len(message.module)})")
+                    
+                    # Check for close matches
+                    for registered in self.module_queues.keys():
+                        if registered.lower() == message.module.lower():
+                            print(f"[Broker]   ⚠ Case mismatch? Registered: '{registered}' vs Incoming: '{message.module}'")
+                    
                     # Send error back
                     error_msg = Message(
                         MessageType.ERROR,
                         message.module,
                         "unknown_module",
-                        {"error": f"Module '{message.module}' not registered. Available: {list(self.module_queues.keys())}"},
+                        {
+                            "error": f"Module '{message.module}' not registered",
+                            "available_modules": list(self.module_queues.keys())
+                        },
                         message.msg_id
                     )
                     self.send_message(error_msg)
                     
         except json.JSONDecodeError as e:
-            print(f"[Broker] Invalid JSON: {e}")
+            print(f"[Broker] ✗ Invalid JSON: {e}")
+            print(f"[Broker]   Raw message: {raw_message[:200]}")
+        except KeyError as e:
+            print(f"[Broker] ✗ Missing key in message: {e}")
+            print(f"[Broker]   Raw message: {raw_message[:200]}")
         except Exception as e:
-            print(f"[Broker] Routing error: {e}")
+            print(f"[Broker] ✗ Routing error: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _send_loop(self):
         """
@@ -185,12 +217,12 @@ class MessageBroker:
                 # Send message with newline delimiter
                 json_msg = message.to_json() + '\n'
                 self.socket.sendall(json_msg.encode('utf-8'))
-                print(f"[Broker] Sent {message.action} from {message.module}")
+                print(f"[Broker] → Sent: {message.type.value} from '{message.module}'.{message.action}")
                 
             except queue.Empty:
                 continue
             except Exception as e:
-                print(f"[Broker] Send error: {e}")
+                print(f"[Broker] ✗ Send error: {e}")
                 if not self.running:
                     break
     
@@ -211,4 +243,5 @@ def get_broker() -> MessageBroker:
     global _broker_instance
     if _broker_instance is None:
         _broker_instance = MessageBroker()
+        print("[Broker] Created new broker instance")
     return _broker_instance
