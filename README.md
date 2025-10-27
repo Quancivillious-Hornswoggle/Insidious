@@ -2,8 +2,6 @@
 
 This is a multi-program tool that allows you to manage parts of a network, computer, or produce frequencies.
 
-
-
 ## Features
 
 - MITM (ARP poison)
@@ -15,8 +13,6 @@ This is a multi-program tool that allows you to manage parts of a network, compu
 - RF Jamming
 - Wi-Fi Password Cracking
 - Wifi Deauth
-
-
 
 ## Installation
 

@@ -18,7 +18,7 @@ namespace Insidious_GUI
         public Mitm()
         {
             InitializeComponent();
-            
+
             // Subscribe to mitm-specific events
             Form1.Bridge.EventReceived += Bridge_EventReceived;
         }
@@ -47,15 +47,15 @@ namespace Insidious_GUI
                 case "attack_status":
                     HandleAttackStatus(message);
                     break;
-                    
+
                 case "attack_progress":
                     HandleAttackProgress(message);
                     break;
-                    
+
                 case "attack_stopped":
                     HandleAttackStopped(message);
                     break;
-                    
+
                 case "status_update":
                     // Handle adapter mode changes
                     break;
@@ -66,12 +66,12 @@ namespace Insidious_GUI
         {
             var json = JsonSerializer.Serialize(message.data);
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            
+
             if (data.ContainsKey("status") && data["status"].ToString() == "poisoning")
             {
                 string target = data.ContainsKey("target") ? data["target"].ToString() : "unknown";
                 string gateway = data.ContainsKey("gateway") ? data["gateway"].ToString() : "unknown";
-                
+
                 // TODO: Update status label
                 // statusLabel.Text = $"Poisoning: {target} <-> {gateway}";
             }
@@ -81,7 +81,7 @@ namespace Insidious_GUI
         {
             var json = JsonSerializer.Serialize(message.data);
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            
+
             if (data.ContainsKey("packets_captured"))
             {
                 // TODO: Update packet count label
@@ -92,18 +92,18 @@ namespace Insidious_GUI
         private void HandleAttackStopped(Message message)
         {
             isPoisoning = false;
-            
+
             var json = JsonSerializer.Serialize(message.data);
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            
+
             if (data.ContainsKey("total_packets"))
             {
                 MessageBox.Show(
-                    $"MITM attack stopped. Total packets captured: {data["total_packets"]}", 
+                    $"MITM attack stopped. Total packets captured: {data["total_packets"]}",
                     "Attack Stopped"
                 );
             }
-            
+
             // TODO: Re-enable start button, disable stop button
         }
 
@@ -137,17 +137,17 @@ namespace Insidious_GUI
                 try
                 {
                     isPoisoning = true;
-                    
-                    var data = new 
-                    { 
-                        target_ip = targetIp, 
-                        gateway_ip = gatewayIp 
+
+                    var data = new
+                    {
+                        target_ip = targetIp,
+                        gateway_ip = gatewayIp
                     };
-                    
+
                     await Form1.Bridge.SendCommandAsync("mitm", "start_poison", data);
-                    
+
                     MessageBox.Show("MITM attack started", "Info");
-                    
+
                     // TODO: Disable start button, enable stop button
                 }
                 catch (Exception ex)
@@ -183,17 +183,17 @@ namespace Insidious_GUI
             {
                 // Use waitForResponse to get immediate status
                 var response = await Form1.Bridge.SendCommandAsync("mitm", "get_status", waitForResponse: true);
-                
+
                 var json = JsonSerializer.Serialize(response.data);
                 var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                
+
                 string status = $"MITM Module Status:\n\n";
                 status += $"Is Poisoning: {data["is_poisoning"]}\n";
                 status += $"Target IP: {data["target_ip"]}\n";
                 status += $"Gateway IP: {data["gateway_ip"]}\n";
                 status += $"Packets Captured: {data["packets_captured"]}\n";
                 status += $"Adapter Mode: {data["adapter_mode"]}\n";
-                
+
                 MessageBox.Show(status, "Module Status");
             }
             catch (Exception ex)
@@ -205,9 +205,14 @@ namespace Insidious_GUI
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            
+
             // Unsubscribe from events
             Form1.Bridge.EventReceived -= Bridge_EventReceived;
+        }
+
+        private void scanDevicesButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

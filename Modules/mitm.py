@@ -16,14 +16,18 @@ class MitmModule(BaseModule):
         # Module state
         self.is_poisoning = False
         self.target_ip = None
+        self.target_ip_list = None
         self.gateway_ip = None
         self.packets_captured = 0
         
         # Register command handlers
-        self.register_handler("start_poison", self.handle_start_poison)
-        self.register_handler("stop_poison", self.handle_stop_poison)
-        self.register_handler("get_status", self.handle_get_status)
-        self.register_handler("get_captured_packets", self.handle_get_packets)
+        self.register_handler("poison_all", self.handle_poison_all())
+        self.register_handler("poison_selected", self.handle_poison_selected())
+        self.register_handler("ddos", self.handle_get_status)
+        self.register_handler("passthrough", self.handle_passthrough())
+        self.register_handler("restore", self.handle_restore())
+        self.register_handler("get_status", self.handle_get_status())
+        self.register_handler("stop", self.handle_stop())
     
     def on_start(self):
         """Initialize module"""
@@ -40,15 +44,14 @@ class MitmModule(BaseModule):
     
     # Command Handlers
     
-    def handle_start_poison(self, message: Message):
-        """Start ARP poisoning attack"""
-        self.target_ip = message.data.get("target_ip")
-        self.gateway_ip = message.data.get("gateway_ip")
-        
-        if not self.target_ip or not self.gateway_ip:
+    def handle_poison_all(self, message: Message):
+        """Handle poisoning all ip's"""
+        self.target_ip_list = message.data.get("target_ips")
+
+        if not self.target_ip:
             return {
                 "status": "error", 
-                "message": "Target IP and Gateway IP required"
+                "message": "Target IP's required"
             }
         
         if self.is_poisoning:
@@ -68,9 +71,70 @@ class MitmModule(BaseModule):
         
         return {
             "status": "attack_started",
-            "target": self.target_ip,
-            "gateway": self.gateway_ip
         }
+
+    def handle_poison_selected(self, message: Message):
+        """Handle poison selection"""
+        self.target_ip = message.data.get("target_ip")
+
+        if not self.target_ip:
+            return {
+                "status": "error",
+                "message": "Target IP required"
+            }
+
+        if self.is_poisoning:
+            return {"status": "error", "message": "Attack already in progress"}
+
+        # Ensure managed mode
+        if iface.ADAPTER_STATUS == "monitor":
+            iface.set_adapter_status("managed")
+            self.send_event("status_update", {"status": "adapter_mode_changed", "mode": "managed"})
+
+        # Start poisoning
+        self.is_poisoning = True
+        self.packets_captured = 0
+
+        poison_thread = threading.Thread(target=self._poison_worker, daemon=True)
+        poison_thread.start()
+
+        return {
+            "status": "attack_started",
+        }
+
+    def handle_dos(self, message: Message):
+        self.target_ip = message.data.get("target_ip")
+
+        if not self.target_ip:
+            return {
+                "status": "error",
+                "message": "Target IP required"
+            }
+
+        if self.is_poisoning:
+            return {"status": "error", "message": "Attack already in progress"}
+
+        # Ensure managed mode
+        if iface.ADAPTER_STATUS == "monitor":
+            iface.set_adapter_status("managed")
+            self.send_event("status_update", {"status": "adapter_mode_changed", "mode": "managed"})
+
+        # Start poisoning
+        self.is_poisoning = True
+        self.packets_captured = 0
+
+        poison_thread = threading.Thread(target=self._poison_worker, daemon=True)
+        poison_thread.start()
+
+        return {
+            "status": "attack_started",
+        }
+
+    def handle_passthrough(self, message: Message):
+        pass
+
+    def handle_restore(self, message: Message):
+        pass
     
     def _poison_worker(self):
         """Background worker for ARP poisoning"""
@@ -122,14 +186,6 @@ class MitmModule(BaseModule):
             "gateway_ip": self.gateway_ip,
             "packets_captured": self.packets_captured,
             "adapter_mode": iface.ADAPTER_STATUS
-        }
-    
-    def handle_get_packets(self, message: Message):
-        """Get captured packet information"""
-        # TODO: Return actual packet data
-        return {
-            "total_packets": self.packets_captured,
-            "packets": []  # Would contain actual packet data
         }
 
 # Initialize module (called by bridge)

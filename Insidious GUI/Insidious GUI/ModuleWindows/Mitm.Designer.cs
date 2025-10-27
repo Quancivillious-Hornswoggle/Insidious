@@ -30,12 +30,12 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mitm));
             listBox1 = new ListBox();
-            deauthAllButton = new Button();
-            button1 = new Button();
-            button4 = new Button();
-            button2 = new Button();
-            button3 = new Button();
-            button5 = new Button();
+            scanDevicesButton = new Button();
+            poisonAllButton = new Button();
+            poisonSelectedButton = new Button();
+            restoreButtn = new Button();
+            doSButton = new Button();
+            packetPassthroughButton = new Button();
             SuspendLayout();
             // 
             // listBox1
@@ -48,83 +48,84 @@
             listBox1.Size = new Size(180, 329);
             listBox1.TabIndex = 2;
             // 
-            // deauthAllButton
+            // scanDevicesButton
             // 
-            deauthAllButton.BackColor = Color.LightGray;
-            deauthAllButton.FlatAppearance.BorderColor = Color.Maroon;
-            deauthAllButton.FlatAppearance.BorderSize = 3;
-            deauthAllButton.FlatStyle = FlatStyle.Flat;
-            deauthAllButton.Location = new Point(12, 12);
-            deauthAllButton.Name = "deauthAllButton";
-            deauthAllButton.Size = new Size(181, 74);
-            deauthAllButton.TabIndex = 4;
-            deauthAllButton.Text = "Scan For Addresses";
-            deauthAllButton.UseVisualStyleBackColor = false;
+            scanDevicesButton.BackColor = Color.LightGray;
+            scanDevicesButton.FlatAppearance.BorderColor = Color.Maroon;
+            scanDevicesButton.FlatAppearance.BorderSize = 3;
+            scanDevicesButton.FlatStyle = FlatStyle.Flat;
+            scanDevicesButton.Location = new Point(12, 12);
+            scanDevicesButton.Name = "scanDevicesButton";
+            scanDevicesButton.Size = new Size(181, 74);
+            scanDevicesButton.TabIndex = 4;
+            scanDevicesButton.Text = "Scan For Addresses";
+            scanDevicesButton.UseVisualStyleBackColor = false;
+            scanDevicesButton.Click += scanDevicesButton_Click;
             // 
-            // button1
+            // poisonAllButton
             // 
-            button1.BackColor = Color.LightGray;
-            button1.FlatAppearance.BorderColor = Color.Maroon;
-            button1.FlatAppearance.BorderSize = 3;
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(228, 18);
-            button1.Name = "button1";
-            button1.Size = new Size(153, 74);
-            button1.TabIndex = 5;
-            button1.Text = "Poison All";
-            button1.UseVisualStyleBackColor = false;
+            poisonAllButton.BackColor = Color.LightGray;
+            poisonAllButton.FlatAppearance.BorderColor = Color.Maroon;
+            poisonAllButton.FlatAppearance.BorderSize = 3;
+            poisonAllButton.FlatStyle = FlatStyle.Flat;
+            poisonAllButton.Location = new Point(228, 18);
+            poisonAllButton.Name = "poisonAllButton";
+            poisonAllButton.Size = new Size(153, 74);
+            poisonAllButton.TabIndex = 5;
+            poisonAllButton.Text = "Poison All";
+            poisonAllButton.UseVisualStyleBackColor = false;
             // 
-            // button4
+            // poisonSelectedButton
             // 
-            button4.BackColor = Color.LightGray;
-            button4.FlatAppearance.BorderColor = Color.Maroon;
-            button4.FlatAppearance.BorderSize = 3;
-            button4.FlatStyle = FlatStyle.Flat;
-            button4.Location = new Point(228, 98);
-            button4.Name = "button4";
-            button4.Size = new Size(153, 74);
-            button4.TabIndex = 6;
-            button4.Text = "Poison Selected IP";
-            button4.UseVisualStyleBackColor = false;
+            poisonSelectedButton.BackColor = Color.LightGray;
+            poisonSelectedButton.FlatAppearance.BorderColor = Color.Maroon;
+            poisonSelectedButton.FlatAppearance.BorderSize = 3;
+            poisonSelectedButton.FlatStyle = FlatStyle.Flat;
+            poisonSelectedButton.Location = new Point(228, 98);
+            poisonSelectedButton.Name = "poisonSelectedButton";
+            poisonSelectedButton.Size = new Size(153, 74);
+            poisonSelectedButton.TabIndex = 6;
+            poisonSelectedButton.Text = "Poison Selected IP";
+            poisonSelectedButton.UseVisualStyleBackColor = false;
             // 
-            // button2
+            // restoreButtn
             // 
-            button2.BackColor = Color.LightGray;
-            button2.FlatAppearance.BorderColor = Color.Maroon;
-            button2.FlatAppearance.BorderSize = 3;
-            button2.FlatStyle = FlatStyle.Flat;
-            button2.Location = new Point(228, 338);
-            button2.Name = "button2";
-            button2.Size = new Size(153, 74);
-            button2.TabIndex = 7;
-            button2.Text = "Restore";
-            button2.UseVisualStyleBackColor = false;
+            restoreButtn.BackColor = Color.LightGray;
+            restoreButtn.FlatAppearance.BorderColor = Color.Maroon;
+            restoreButtn.FlatAppearance.BorderSize = 3;
+            restoreButtn.FlatStyle = FlatStyle.Flat;
+            restoreButtn.Location = new Point(228, 338);
+            restoreButtn.Name = "restoreButtn";
+            restoreButtn.Size = new Size(153, 74);
+            restoreButtn.TabIndex = 7;
+            restoreButtn.Text = "Restore";
+            restoreButtn.UseVisualStyleBackColor = false;
             // 
-            // button3
+            // doSButton
             // 
-            button3.BackColor = Color.LightGray;
-            button3.FlatAppearance.BorderColor = Color.Maroon;
-            button3.FlatAppearance.BorderSize = 3;
-            button3.FlatStyle = FlatStyle.Flat;
-            button3.Location = new Point(228, 178);
-            button3.Name = "button3";
-            button3.Size = new Size(153, 74);
-            button3.TabIndex = 8;
-            button3.Text = "DDOS";
-            button3.UseVisualStyleBackColor = false;
+            doSButton.BackColor = Color.LightGray;
+            doSButton.FlatAppearance.BorderColor = Color.Maroon;
+            doSButton.FlatAppearance.BorderSize = 3;
+            doSButton.FlatStyle = FlatStyle.Flat;
+            doSButton.Location = new Point(228, 178);
+            doSButton.Name = "doSButton";
+            doSButton.Size = new Size(153, 74);
+            doSButton.TabIndex = 8;
+            doSButton.Text = "DDOS";
+            doSButton.UseVisualStyleBackColor = false;
             // 
-            // button5
+            // packetPassthroughButton
             // 
-            button5.BackColor = Color.LightGray;
-            button5.FlatAppearance.BorderColor = Color.Maroon;
-            button5.FlatAppearance.BorderSize = 3;
-            button5.FlatStyle = FlatStyle.Flat;
-            button5.Location = new Point(228, 258);
-            button5.Name = "button5";
-            button5.Size = new Size(153, 74);
-            button5.TabIndex = 9;
-            button5.Text = "Packet Passthrough";
-            button5.UseVisualStyleBackColor = false;
+            packetPassthroughButton.BackColor = Color.LightGray;
+            packetPassthroughButton.FlatAppearance.BorderColor = Color.Maroon;
+            packetPassthroughButton.FlatAppearance.BorderSize = 3;
+            packetPassthroughButton.FlatStyle = FlatStyle.Flat;
+            packetPassthroughButton.Location = new Point(228, 258);
+            packetPassthroughButton.Name = "packetPassthroughButton";
+            packetPassthroughButton.Size = new Size(153, 74);
+            packetPassthroughButton.TabIndex = 9;
+            packetPassthroughButton.Text = "Packet Passthrough";
+            packetPassthroughButton.UseVisualStyleBackColor = false;
             // 
             // Mitm
             // 
@@ -132,12 +133,12 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Black;
             ClientSize = new Size(410, 433);
-            Controls.Add(button5);
-            Controls.Add(button3);
-            Controls.Add(button2);
-            Controls.Add(button4);
-            Controls.Add(button1);
-            Controls.Add(deauthAllButton);
+            Controls.Add(packetPassthroughButton);
+            Controls.Add(doSButton);
+            Controls.Add(restoreButtn);
+            Controls.Add(poisonSelectedButton);
+            Controls.Add(poisonAllButton);
+            Controls.Add(scanDevicesButton);
             Controls.Add(listBox1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -150,11 +151,11 @@
 
         #endregion
         private ListBox listBox1;
-        private Button deauthAllButton;
-        private Button button1;
-        private Button button4;
-        private Button button2;
-        private Button button3;
-        private Button button5;
+        private Button scanDevicesButton;
+        private Button poisonAllButton;
+        private Button poisonSelectedButton;
+        private Button restoreButtn;
+        private Button doSButton;
+        private Button packetPassthroughButton;
     }
 }
