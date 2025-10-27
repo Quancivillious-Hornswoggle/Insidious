@@ -21,13 +21,13 @@ class MitmModule(BaseModule):
         self.packets_captured = 0
         
         # Register command handlers
-        self.register_handler("poison_all", self.handle_poison_all())
-        self.register_handler("poison_selected", self.handle_poison_selected())
+        self.register_handler("poison_all", self.handle_poison_all)
+        self.register_handler("poison_selected", self.handle_poison_selected)
         self.register_handler("ddos", self.handle_get_status)
-        self.register_handler("passthrough", self.handle_passthrough())
-        self.register_handler("restore", self.handle_restore())
-        self.register_handler("get_status", self.handle_get_status())
-        self.register_handler("stop", self.handle_stop())
+        self.register_handler("passthrough", self.handle_passthrough)
+        self.register_handler("restore", self.handle_restore)
+        self.register_handler("get_status", self.handle_get_status)
+        self.register_handler("stop", self.handle_stop_poison)
     
     def on_start(self):
         """Initialize module"""

@@ -18,8 +18,8 @@ class DNSModule(BaseModule):
         self.domain_source_list = None
 
         # Register command handlers
-        self.register_handler("spoof", self.handle_spoof())
-        self.register_handler("stop", self.handle_stop())
+        self.register_handler("spoof", self.handle_spoof)
+        self.register_handler("stop", self.handle_stop)
 
     def on_start(self):
         """Initialize module"""
