@@ -7,7 +7,7 @@ from Network_Modules import network_adapter as iface
 import threading
 
 class DNSModule(BaseModule):
-    def __init__(self, dns_server):
+    def __init__(self):
         super().__init__("dns")
 
         # Module state
