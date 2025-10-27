@@ -90,7 +90,7 @@ def main(ss, ms):
         modules = {
             'deauth': deauth.get_module(),
             'mitm': mitm.get_module(),
-            'dns' : dns.get_module(),
+            #'dns' : dns.get_module(),
             # 'server': server.get_module(),
             # 'packet_capture': packet_capture.get_module(),
             # 'wifi_brute': wifi_brute.get_module(),

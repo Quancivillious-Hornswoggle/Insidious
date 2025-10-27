@@ -7,7 +7,7 @@ import queue
 import threading
 from abc import ABC, abstractmethod
 from typing import Callable, Dict
-from .message_broker import Message, MessageType, get_broker
+from message_broker import Message, MessageType, get_broker
 
 class BaseModule(ABC):
     """
