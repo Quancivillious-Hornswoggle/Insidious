@@ -134,7 +134,9 @@ def main(ss, ms):
         
         # STEP 4: Verify registration
         print("\n[4] Verifying broker registration...")
-        print(f"    Registered modules: {list(broker.module_queues.keys())}")
+        print(f"    Checking broker instance (id: {id(broker)})")
+        registered_modules = broker.list_registered_modules()
+        print(f"    Module queues: {registered_modules}")
         
         if len(broker.module_queues) == 0:
             print("    ✗✗✗ ERROR: No modules registered! ✗✗✗")

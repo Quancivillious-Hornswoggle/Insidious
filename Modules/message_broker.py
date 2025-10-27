@@ -243,5 +243,7 @@ def get_broker() -> MessageBroker:
     global _broker_instance
     if _broker_instance is None:
         _broker_instance = MessageBroker()
-        print("[Broker] Created new broker instance")
+        print(f"[Broker] Created new broker instance (id: {id(_broker_instance)})")
+    else:
+        print(f"[Broker] Returning existing broker instance (id: {id(_broker_instance)})")
     return _broker_instance
