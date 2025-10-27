@@ -156,13 +156,14 @@ class MessageBroker:
                     self.module_queues[message.module].put(message)
                     print(f"[Broker] Routed {message.action} to {message.module}")
                 else:
-                    print(f"[Broker] Unknown module: {message.module}")
+                    print(f"[Broker] ERROR: Unknown module: {message.module}")
+                    print(f"[Broker] Available modules: {list(self.module_queues.keys())}")
                     # Send error back
                     error_msg = Message(
                         MessageType.ERROR,
                         message.module,
                         "unknown_module",
-                        {"error": f"Module '{message.module}' not registered"},
+                        {"error": f"Module '{message.module}' not registered. Available: {list(self.module_queues.keys())}"},
                         message.msg_id
                     )
                     self.send_message(error_msg)

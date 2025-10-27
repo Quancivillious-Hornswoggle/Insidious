@@ -3,10 +3,10 @@ Man-in-the-Middle (MITM) Module
 Provides methods to ARP poison devices
 """
 
-from Network_Modules import network_adapter as iface
-from Network_Modules import net_tools as network
-from base_module import BaseModule
-from message_broker import Message
+from .Network_Modules import network_adapter as iface
+from .Network_Modules import net_tools as network
+from .base_module import BaseModule
+from .message_broker import Message
 from scapy.layers.inet import Ether
 import scapy.all as scapy
 import threading

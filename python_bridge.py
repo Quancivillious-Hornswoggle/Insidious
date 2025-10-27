@@ -6,7 +6,6 @@ program
 """
 
 import socket
-import threading
 import time
 import sys
 import os

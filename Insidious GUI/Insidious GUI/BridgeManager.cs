@@ -13,10 +13,10 @@ namespace Insidious_GUI
     /// </summary>
     public enum MessageType
     {
-        COMMAND,
-        RESPONSE,
+        CMD,
+        RESP,
         EVENT,
-        ERROR
+        ERR
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ namespace Insidious_GUI
             if (!IsConnected)
                 throw new InvalidOperationException("Not connected to bridge");
 
-            var message = new Message(MessageType.COMMAND, module, action, data);
+            var message = new Message(MessageType.CMD, module, action, data);
             
             TaskCompletionSource<Message> responseTask = null;
             

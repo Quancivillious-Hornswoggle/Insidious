@@ -3,9 +3,9 @@ Network Deauthentication Module
 Deauthenticates specified or all clients on a network
 """
 
-from Network_Modules import network_adapter as iface
-from base_module import BaseModule
-from message_broker import Message
+from .Network_Modules import network_adapter as iface
+from .base_module import BaseModule
+from .message_broker import Message
 import time
 import threading
 

@@ -144,7 +144,7 @@ namespace Insidious_GUI
                         gateway_ip = gatewayIp
                     };
 
-                    await Form1.Bridge.SendCommandAsync("mitm", "start_poison", data);
+                    await Form1.Bridge.SendCommandAsync("mitm", "poison_all", data);
 
                     MessageBox.Show("MITM attack started", "Info");
 
