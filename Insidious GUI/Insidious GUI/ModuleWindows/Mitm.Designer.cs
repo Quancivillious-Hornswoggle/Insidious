@@ -74,6 +74,7 @@
             poisonAllButton.TabIndex = 5;
             poisonAllButton.Text = "Poison All";
             poisonAllButton.UseVisualStyleBackColor = false;
+            poisonAllButton.Click += startPoisonButton_Click;
             // 
             // poisonSelectedButton
             // 

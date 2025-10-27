@@ -117,7 +117,7 @@ namespace Insidious_GUI
 
             // TODO: Get target IP and gateway IP from your UI controls
             string targetIp = "192.168.1.100"; // Replace with actual input
-            string gatewayIp = "192.168.1.1"; // Replace with actual input
+            string gatewayIp = "192.168.0.1"; // Replace with actual input
 
             if (string.IsNullOrEmpty(targetIp) || string.IsNullOrEmpty(gatewayIp))
             {
@@ -211,6 +211,11 @@ namespace Insidious_GUI
         }
 
         private void scanDevicesButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void poisonAllButton_Click(object sender, EventArgs e)
         {
 
         }
