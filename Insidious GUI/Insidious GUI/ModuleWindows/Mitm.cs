@@ -45,36 +45,17 @@ namespace Insidious_GUI
         {
             switch (message.action)
             {
-                case "attack_status":
-                    HandleAttackStatus(message);
+                case "scan_completed":
+                    HandleHostScan(message);
                     break;
 
-                case "attack_progress":
+                case "attack_status":
                     HandleAttackProgress(message);
                     break;
 
-                case "attack_stopped":
+                case "attack_error":
                     HandleAttackStopped(message);
                     break;
-
-                case "status_update":
-                    // Handle adapter mode changes
-                    break;
-            }
-        }
-
-        private void HandleAttackStatus(Message message)
-        {
-            var json = JsonSerializer.Serialize(message.data);
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-            if (data.ContainsKey("status") && data["status"].ToString() == "poisoning")
-            {
-                string target = data.ContainsKey("target") ? data["target"].ToString() : "unknown";
-                string gateway = data.ContainsKey("gateway") ? data["gateway"].ToString() : "unknown";
-
-                // TODO: Update status label
-                // statusLabel.Text = $"Poisoning: {target} <-> {gateway}";
             }
         }
 
@@ -88,6 +69,16 @@ namespace Insidious_GUI
                 // TODO: Update packet count label
                 // packetCountLabel.Text = $"Packets captured: {data["packets_captured"]}";
             }
+        }
+
+        private void HandleHostScan(Message message)
+        {
+            var json = JsonSerializer.Serialize(message.data);
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+            var hosts = data["hosts"];
+
+            MessageBox.Show(hosts.ToString());
         }
 
         private void HandleAttackStopped(Message message)
@@ -213,13 +204,7 @@ namespace Insidious_GUI
 
         private async void scanDevicesButton_Click(object sender, EventArgs e)
         {
-            var response = await Form1.Bridge.SendCommandAsync("mitm", "scan", waitForResponse: true);
-            var json = JsonSerializer.Serialize(response.data);
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-            var hosts = data["hosts"];
-
-            MessageBox.Show(hosts.ToString());
+            await Form1.Bridge.SendCommandAsync("mitm", "scan");
         }
 
         private void poisonAllButton_Click(object sender, EventArgs e)
