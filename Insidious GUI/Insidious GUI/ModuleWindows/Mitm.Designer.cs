@@ -88,6 +88,7 @@
             poisonSelectedButton.TabIndex = 6;
             poisonSelectedButton.Text = "Poison Selected IP";
             poisonSelectedButton.UseVisualStyleBackColor = false;
+            poisonSelectedButton.Click += poisonSelectedButton_Click;
             // 
             // restoreButtn
             // 

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Security;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,11 +14,12 @@ namespace Insidious_GUI
     public partial class Mitm : Form
     {
         private bool isPoisoning = false;
+        private bool isScanning = false;
 
         public Mitm()
         {
             InitializeComponent();
-
+            
             // Subscribe to mitm-specific events
             Form1.Bridge.EventReceived += Bridge_EventReceived;
         }
@@ -45,17 +45,43 @@ namespace Insidious_GUI
         {
             switch (message.action)
             {
-                case "scan_completed":
-                    HandleHostScan(message);
-                    break;
-
                 case "attack_status":
+                    HandleAttackStatus(message);
+                    break;
+                    
+                case "attack_progress":
                     HandleAttackProgress(message);
                     break;
-
-                case "attack_error":
+                    
+                case "attack_stopped":
                     HandleAttackStopped(message);
                     break;
+                    
+                case "status_update":
+                    // Handle adapter mode changes
+                    break;
+                    
+                case "scan_completed":
+                    HandleScanCompleted(message);
+                    break;
+                    
+                case "scan_error":
+                    HandleScanError(message);
+                    break;
+            }
+        }
+
+        private void HandleAttackStatus(Message message)
+        {
+            var json = JsonSerializer.Serialize(message.data);
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            
+            if (data.ContainsKey("status") && data["status"].ToString() == "poisoning")
+            {
+                string target = data.ContainsKey("target") ? data["target"].ToString() : "unknown";
+                
+                // Update status
+                this.Text = $"MITM - Poisoning {target}";
             }
         }
 
@@ -63,40 +89,144 @@ namespace Insidious_GUI
         {
             var json = JsonSerializer.Serialize(message.data);
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
+            
             if (data.ContainsKey("packets_captured"))
             {
-                // TODO: Update packet count label
-                // packetCountLabel.Text = $"Packets captured: {data["packets_captured"]}";
+                // Could update a label showing packet count if you add one
+                // packetCountLabel.Text = $"Packets: {data["packets_captured"]}";
             }
-        }
-
-        private void HandleHostScan(Message message)
-        {
-            var json = JsonSerializer.Serialize(message.data);
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-            var hosts = data["hosts"];
-
-            MessageBox.Show(hosts.ToString());
         }
 
         private void HandleAttackStopped(Message message)
         {
             isPoisoning = false;
-
+            
             var json = JsonSerializer.Serialize(message.data);
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
+            
             if (data.ContainsKey("total_packets"))
             {
                 MessageBox.Show(
-                    $"MITM attack stopped. Total packets captured: {data["total_packets"]}",
+                    $"MITM attack stopped. Total packets captured: {data["total_packets"]}", 
                     "Attack Stopped"
                 );
             }
+            
+            this.Text = "MITM";
+            scanDevicesButton.Enabled = true;
+            poisonAllButton.Enabled = true;
+            poisonSelectedButton.Enabled = true;
+        }
 
-            // TODO: Re-enable start button, disable stop button
+        private void HandleScanCompleted(Message message)
+        {
+            isScanning = false;
+            
+            try
+            {
+                // Parse the hosts list from the message
+                var json = JsonSerializer.Serialize(message.data);
+                var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);
+                
+                if (data.ContainsKey("hosts"))
+                {
+                    var hostsElement = data["hosts"];
+                    
+                    // Clear existing items
+                    ipListBox.Items.Clear();
+                    
+                    // Add each host to the list
+                    if (hostsElement.ValueKind == JsonValueKind.Array)
+                    {
+                        var hosts = hostsElement.EnumerateArray().ToList();
+                        
+                        foreach (var host in hosts)
+                        {
+                            string ipAddress = host.GetString();
+                            ipListBox.Items.Add(ipAddress);
+                        }
+                        
+                        // Update button and show result
+                        scanDevicesButton.Text = "Scan For Addresses";
+                        scanDevicesButton.Enabled = true;
+                        
+                        MessageBox.Show(
+                            $"Scan complete! Found {hosts.Count} devices.",
+                            "Scan Complete",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error parsing scan results: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+                
+                scanDevicesButton.Text = "Scan For Addresses";
+                scanDevicesButton.Enabled = true;
+            }
+        }
+
+        private void HandleScanError(Message message)
+        {
+            isScanning = false;
+            
+            var json = JsonSerializer.Serialize(message.data);
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            
+            string errorMsg = data.ContainsKey("error") ? data["error"].ToString() : "Unknown error";
+            
+            ipListBox.Items.Clear();
+            scanDevicesButton.Text = "Scan For Addresses";
+            scanDevicesButton.Enabled = true;
+            
+            MessageBox.Show(
+                $"Scan failed: {errorMsg}",
+                "Scan Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
+        private async void scanDevicesButton_Click(object sender, EventArgs e)
+        {
+            if (isScanning)
+            {
+                MessageBox.Show("Scan already in progress", "Info");
+                return;
+            }
+
+            try
+            {
+                isScanning = true;
+                
+                // Update button
+                scanDevicesButton.Text = "Scanning...";
+                scanDevicesButton.Enabled = false;
+                
+                // Clear current list
+                ipListBox.Items.Clear();
+                ipListBox.Items.Add("Scanning network...");
+                
+                // Send scan command
+                await Form1.Bridge.SendCommandAsync("mitm", "scan");
+                
+                // The HandleScanCompleted event will populate the list when done
+            }
+            catch (Exception ex)
+            {
+                isScanning = false;
+                scanDevicesButton.Text = "Scan For Addresses";
+                scanDevicesButton.Enabled = true;
+                
+                MessageBox.Show($"Error starting scan: {ex.Message}", "Error");
+            }
         }
 
         private async void startPoisonButton_Click(object sender, EventArgs e)
@@ -107,18 +237,21 @@ namespace Insidious_GUI
                 return;
             }
 
-            // TODO: Get target IP and gateway IP from your UI controls
-            string targetIp = "10.10.26.116"; // Replace with actual input
-            string gatewayIp = "10.10.27.1"; // Replace with actual input
-
-            if (string.IsNullOrEmpty(targetIp) || string.IsNullOrEmpty(gatewayIp))
+            // Check if we have scanned devices
+            if (ipListBox.Items.Count == 0)
             {
-                MessageBox.Show("Please enter target IP and gateway IP", "Info");
+                MessageBox.Show(
+                    "Please scan for devices first",
+                    "No Devices",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
                 return;
             }
 
             var result = MessageBox.Show(
-                $"Start MITM attack?\nTarget: {targetIp}\nGateway: {gatewayIp}",
+                $"Start MITM attack on all devices?\n\n" +
+                $"This will poison {ipListBox.Items.Count} devices.",
                 "Confirm Attack",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning
@@ -129,18 +262,78 @@ namespace Insidious_GUI
                 try
                 {
                     isPoisoning = true;
-
-                    var data = new
+                    
+                    // Get all IPs from the list
+                    var targetIps = new List<string>();
+                    foreach (var item in ipListBox.Items)
                     {
-                        target_ip = targetIp,
-                        gateway_ip = gatewayIp
-                    };
+                        targetIps.Add(item.ToString());
+                    }
+                    
+                    var data = new { target_ips = targetIps };
+                    
+                    await Form1.Bridge.SendCommandAsync("mitm", "poison_all", data);
+                    
+                    MessageBox.Show("MITM attack started on all devices", "Info");
+                    
+                    // Disable buttons during attack
+                    scanDevicesButton.Enabled = false;
+                    poisonAllButton.Enabled = false;
+                    poisonSelectedButton.Enabled = false;
+                }
+                catch (Exception ex)
+                {
+                    isPoisoning = false;
+                    MessageBox.Show($"Error starting attack: {ex.Message}", "Error");
+                }
+            }
+        }
 
+        private async void poisonSelectedButton_Click(object sender, EventArgs e)
+        {
+            if (isPoisoning)
+            {
+                MessageBox.Show("MITM attack already in progress", "Info");
+                return;
+            }
+
+            // Check if an IP is selected
+            if (ipListBox.SelectedItem == null)
+            {
+                MessageBox.Show(
+                    "Please select a target IP address",
+                    "No Selection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
+
+            string selectedIp = ipListBox.SelectedItem.ToString();
+
+            var result = MessageBox.Show(
+                $"Start MITM attack on {selectedIp}?",
+                "Confirm Attack",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    isPoisoning = true;
+                    
+                    var data = new { target_ip = selectedIp };
+                    
                     await Form1.Bridge.SendCommandAsync("mitm", "poison_selected", data);
-
-                    MessageBox.Show("MITM attack started", "Info");
-
-                    // TODO: Disable start button, enable stop button
+                    
+                    MessageBox.Show($"MITM attack started on {selectedIp}", "Info");
+                    
+                    // Disable buttons during attack
+                    scanDevicesButton.Enabled = false;
+                    poisonAllButton.Enabled = false;
+                    poisonSelectedButton.Enabled = false;
                 }
                 catch (Exception ex)
                 {
@@ -175,17 +368,16 @@ namespace Insidious_GUI
             {
                 // Use waitForResponse to get immediate status
                 var response = await Form1.Bridge.SendCommandAsync("mitm", "get_status", waitForResponse: true);
-
+                
                 var json = JsonSerializer.Serialize(response.data);
                 var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
+                
                 string status = $"MITM Module Status:\n\n";
                 status += $"Is Poisoning: {data["is_poisoning"]}\n";
                 status += $"Target IP: {data["target_ip"]}\n";
                 status += $"Gateway IP: {data["gateway_ip"]}\n";
-                status += $"Packets Captured: {data["packets_captured"]}\n";
                 status += $"Adapter Mode: {data["adapter_mode"]}\n";
-
+                
                 MessageBox.Show(status, "Module Status");
             }
             catch (Exception ex)
@@ -197,25 +389,9 @@ namespace Insidious_GUI
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-
+            
             // Unsubscribe from events
             Form1.Bridge.EventReceived -= Bridge_EventReceived;
-        }
-
-        private async void scanDevicesButton_Click(object sender, EventArgs e)
-        {
-            var response = await Form1.Bridge.SendCommandAsync("mitm", "scan", waitForResponse: true);
-            var json = JsonSerializer.Serialize(response.data);
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-            var hosts = data["hosts"];
-
-            MessageBox.Show(hosts.ToString());
-        }
-
-        private void poisonAllButton_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
