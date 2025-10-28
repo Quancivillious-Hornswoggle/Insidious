@@ -116,8 +116,8 @@ namespace Insidious_GUI
             }
 
             // TODO: Get target IP and gateway IP from your UI controls
-            string targetIp = "192.168.1.100"; // Replace with actual input
-            string gatewayIp = "192.168.0.1"; // Replace with actual input
+            string targetIp = "10.10.27.78"; // Replace with actual input
+            string gatewayIp = "10.10.27.1"; // Replace with actual input
 
             if (string.IsNullOrEmpty(targetIp) || string.IsNullOrEmpty(gatewayIp))
             {
@@ -144,7 +144,7 @@ namespace Insidious_GUI
                         gateway_ip = gatewayIp
                     };
 
-                    await Form1.Bridge.SendCommandAsync("mitm", "poison_all", data);
+                    await Form1.Bridge.SendCommandAsync("mitm", "poison_selected", data);
 
                     MessageBox.Show("MITM attack started", "Info");
 
