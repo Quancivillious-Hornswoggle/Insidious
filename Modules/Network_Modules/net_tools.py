@@ -13,10 +13,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def get_local_ip() -> str:
     """Get the local IP address of the machine"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        return socket.gethostbyname(socket.gethostname())
+        # Connect to a public IP address (e.g., Google's DNS server)
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
     except Exception:
-        return "127.0.0.1"
+        local_ip = "127.0.0.1"
+    finally:
+        s.close()
+    return local_ip
 
 
 def get_network_range() -> str:
