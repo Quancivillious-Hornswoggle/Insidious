@@ -204,7 +204,7 @@ namespace Insidious_GUI
 
         private async void scanDevicesButton_Click(object sender, EventArgs e)
         {
-            var reponse = await Form1.Bridge.SendCommandAsync("mitm", "scan");
+            var response = await Form1.Bridge.SendCommandAsync("mitm", "scan");
         }
 
         private void poisonAllButton_Click(object sender, EventArgs e)

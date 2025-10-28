@@ -212,7 +212,7 @@ class MitmModule(BaseModule):
 
     def _scan_worker(self):
         """Internal method to scan hosts"""
-        hosts = network.scan_network()
+        hosts = network.scan_network(network.get_network_range())
         self.send_event("scan_completed", {"hosts": hosts})
 
 # Initialize module (called by bridge)

@@ -14,11 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def get_local_ip() -> str:
     """Get the local IP address of the machine"""
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
-        return local_ip
+        return socket.gethostbyname(socket.gethostname())
     except Exception:
         return "127.0.0.1"
 
@@ -289,7 +285,7 @@ if __name__ == "__main__":
     print("\n--- MAC Address Lookups ---")
 
     # Get wlan0 MAC
-    wlan_mac = get_adapter_mac("wlan0")
+    wlan_mac = get_adapter_mac("Wi-Fi")
     print(f"wlan0 MAC: {wlan_mac}")
 
     # Get router MAC
