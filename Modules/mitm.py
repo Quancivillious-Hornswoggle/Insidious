@@ -212,9 +212,7 @@ class MitmModule(BaseModule):
     def scan_hosts(self):
         """Internal method to scan hosts"""
         hosts = network.scan_network(self.gateway_ip)
-        return {
-            "hosts": hosts,
-        }
+        self.send_response({"status": "scanned", "hosts": hosts})
 
 # Initialize module (called by bridge)
 def init(host_socket):

@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\yello\\Insidious\\Insidious GUI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|C:\\Users\\yello\\Insidious\\Insidious GUI\\insidious gui\\modulewindows\\mitm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|solutionrelative:insidious gui\\modulewindows\\mitm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|c:\\users\\yello\\insidious\\insidious gui\\insidious gui\\modulewindows\\mitm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|solutionrelative:insidious gui\\modulewindows\\mitm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|C:\\Users\\yello\\Insidious\\Insidious GUI\\insidious gui\\modulewindows\\mitm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|solutionrelative:insidious gui\\modulewindows\\mitm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{12FE9523-AF83-4002-88FD-F673445C427D}|Insidious GUI\\Insidious GUI.csproj|C:\\Users\\yello\\Insidious\\Insidious GUI\\insidious gui\\modulewindows\\dns.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
@@ -46,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
@@ -58,8 +58,7 @@
               "RelativeToolTip": "Insidious GUI\\ModuleWindows\\Mitm.Designer.cs",
               "ViewState": "AgIAACkAAAAAAAAAAAAYwD4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-28T04:18:38.759Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-28T04:18:38.759Z"
             },
             {
               "$type": "Document",
@@ -82,33 +81,31 @@
               "ToolTip": "C:\\Users\\yello\\Insidious\\Insidious GUI\\Insidious GUI\\ModuleWindows\\DNS.cs [Design]",
               "RelativeToolTip": "Insidious GUI\\ModuleWindows\\DNS.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-27T03:19:34.467Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-10-27T03:19:34.467Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Mitm.cs",
               "DocumentMoniker": "C:\\Users\\yello\\Insidious\\Insidious GUI\\Insidious GUI\\ModuleWindows\\Mitm.cs",
               "RelativeDocumentMoniker": "Insidious GUI\\ModuleWindows\\Mitm.cs",
               "ToolTip": "C:\\Users\\yello\\Insidious\\Insidious GUI\\Insidious GUI\\ModuleWindows\\Mitm.cs",
               "RelativeToolTip": "Insidious GUI\\ModuleWindows\\Mitm.cs",
-              "ViewState": "AgIAALcAAAAAAAAAAAAgwNMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAMUAAAAAAAAAAAAgwN0AAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-20T20:00:47.618Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Mitm.cs [Design]",
               "DocumentMoniker": "C:\\Users\\yello\\Insidious\\Insidious GUI\\Insidious GUI\\ModuleWindows\\Mitm.cs",
               "RelativeDocumentMoniker": "Insidious GUI\\ModuleWindows\\Mitm.cs",
               "ToolTip": "C:\\Users\\yello\\Insidious\\Insidious GUI\\Insidious GUI\\ModuleWindows\\Mitm.cs [Design]",
               "RelativeToolTip": "Insidious GUI\\ModuleWindows\\Mitm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-20T19:54:19.6Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-10-20T19:54:19.6Z"
             },
             {
               "$type": "Document",
