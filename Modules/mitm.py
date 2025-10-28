@@ -25,7 +25,7 @@ except ImportError:
     from base_module import BaseModule
     from message_broker import Message
 
-from scapy.layers.inet import Ether
+from scapy.all import *
 import scapy.all as scapy
 import threading
 
