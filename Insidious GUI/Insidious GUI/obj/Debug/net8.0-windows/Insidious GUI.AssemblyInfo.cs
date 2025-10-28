@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Insidious GUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8dad71b7479871edb043930b4c3c2877cd9a710c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4588863582f4819c8f071281b0e863191ce75d39")]
 [assembly: System.Reflection.AssemblyProductAttribute("Insidious GUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Insidious GUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

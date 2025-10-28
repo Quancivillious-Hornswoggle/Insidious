@@ -116,7 +116,7 @@ namespace Insidious_GUI
             }
 
             // TODO: Get target IP and gateway IP from your UI controls
-            string targetIp = "10.10.27.78"; // Replace with actual input
+            string targetIp = "10.10.26.116"; // Replace with actual input
             string gatewayIp = "10.10.27.1"; // Replace with actual input
 
             if (string.IsNullOrEmpty(targetIp) || string.IsNullOrEmpty(gatewayIp))
