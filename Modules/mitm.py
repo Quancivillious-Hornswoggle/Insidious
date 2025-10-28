@@ -204,16 +204,10 @@ class MitmModule(BaseModule):
         }
 
     def handle_scan(self, message: Message):
-        scan_thread = threading.Thread(target=self._scan_worker(), daemon=True)
-        scan_thread.start()
-        return {
-            "is_scanning": True
-        }
-
-    def _scan_worker(self):
-        """Internal method to scan hosts"""
         hosts = network.scan_network(network.get_network_range(iface.ADAPTER_NAME), max_workers=50)
-        self.send_event("scan_completed", {"hosts": hosts})
+        return {
+            "hosts": hosts
+        }
 
 # Initialize module (called by bridge)
 def init(host_socket):
