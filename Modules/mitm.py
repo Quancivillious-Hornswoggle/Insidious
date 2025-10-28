@@ -51,6 +51,7 @@ class MitmModule(BaseModule):
         self.register_handler("restore", self.handle_restore)
         self.register_handler("get_status", self.handle_get_status)
         self.register_handler("stop", self.handle_stop_poison)
+        self.register_handler("scan", self.handle_scan)
     
     def on_start(self):
         """Initialize module"""
@@ -119,7 +120,6 @@ class MitmModule(BaseModule):
 
         # Start poisoning
         self.is_poisoning = True
-        self.packets_captured = 0
 
         poison_thread = threading.Thread(target=self._poison_worker, daemon=True)
         poison_thread.start()
@@ -201,6 +201,19 @@ class MitmModule(BaseModule):
             "gateway_ip": self.gateway_ip,
             "packets_captured": self.packets_captured,
             "adapter_mode": iface.ADAPTER_STATUS
+        }
+
+    def handle_scan(self, message: Message):
+        self.scan_hosts()
+        return {
+            "is_scanning": True
+        }
+
+    def scan_hosts(self):
+        """Internal method to scan hosts"""
+        hosts = network.scan_network(self.gateway_ip)
+        return {
+            "hosts": hosts,
         }
 
 # Initialize module (called by bridge)

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -168,7 +169,7 @@ namespace Insidious_GUI
 
             try
             {
-                await Form1.Bridge.SendCommandAsync("mitm", "stop_poison");
+                await Form1.Bridge.SendCommandAsync("mitm", "stop");
                 MessageBox.Show("Stopping MITM attack...", "Info");
             }
             catch (Exception ex)
@@ -210,9 +211,15 @@ namespace Insidious_GUI
             Form1.Bridge.EventReceived -= Bridge_EventReceived;
         }
 
-        private void scanDevicesButton_Click(object sender, EventArgs e)
+        private async void scanDevicesButton_Click(object sender, EventArgs e)
         {
+            var response = await Form1.Bridge.SendCommandAsync("mitm", "scan", waitForResponse: true);
+            var json = JsonSerializer.Serialize(response.data);
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
 
+            var hosts = data["hosts"];
+
+            MessageBox.Show(hosts.ToString());
         }
 
         private void poisonAllButton_Click(object sender, EventArgs e)

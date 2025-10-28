@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mitm));
-            listBox1 = new ListBox();
+            ipListBox = new ListBox();
             scanDevicesButton = new Button();
             poisonAllButton = new Button();
             poisonSelectedButton = new Button();
@@ -38,15 +38,15 @@
             packetPassthroughButton = new Button();
             SuspendLayout();
             // 
-            // listBox1
+            // ipListBox
             // 
-            listBox1.BackColor = Color.DarkGray;
-            listBox1.FormattingEnabled = true;
-            listBox1.ItemHeight = 25;
-            listBox1.Location = new Point(12, 92);
-            listBox1.Name = "listBox1";
-            listBox1.Size = new Size(180, 329);
-            listBox1.TabIndex = 2;
+            ipListBox.BackColor = Color.DarkGray;
+            ipListBox.FormattingEnabled = true;
+            ipListBox.ItemHeight = 25;
+            ipListBox.Location = new Point(12, 92);
+            ipListBox.Name = "ipListBox";
+            ipListBox.Size = new Size(180, 329);
+            ipListBox.TabIndex = 2;
             // 
             // scanDevicesButton
             // 
@@ -101,6 +101,7 @@
             restoreButtn.TabIndex = 7;
             restoreButtn.Text = "Restore";
             restoreButtn.UseVisualStyleBackColor = false;
+            restoreButtn.Click += stopPoisonButton_Click;
             // 
             // doSButton
             // 
@@ -140,7 +141,7 @@
             Controls.Add(poisonSelectedButton);
             Controls.Add(poisonAllButton);
             Controls.Add(scanDevicesButton);
-            Controls.Add(listBox1);
+            Controls.Add(ipListBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -151,7 +152,7 @@
         }
 
         #endregion
-        private ListBox listBox1;
+        private ListBox ipListBox;
         private Button scanDevicesButton;
         private Button poisonAllButton;
         private Button poisonSelectedButton;
