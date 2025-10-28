@@ -11,23 +11,65 @@ from typing import List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-def get_local_ip() -> str:
-    """Get the local IP address of the machine"""
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+def get_local_ip(interface: str = "wlan0") -> str:
+    """Get the local IP address of a specific network interface
+    
+    Args:
+        interface: Network interface name (default: "wlan0")
+        
+    Returns:
+        IP address string or "127.0.0.1" if not found
+    """
     try:
-        # Connect to a public IP address (e.g., Google's DNS server)
+        # Method 1: Use ip addr show command
+        result = subprocess.run(
+            ["ip", "addr", "show", interface],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        
+        # Parse IPv4 address from output
+        match = re.search(r'inet (\d+\.\d+\.\d+\.\d+)', result.stdout)
+        if match:
+            return match.group(1)
+        
+        # Method 2: Try ifconfig if ip command failed
+        result = subprocess.run(
+            ["ifconfig", interface],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        
+        match = re.search(r'inet (\d+\.\d+\.\d+\.\d+)', result.stdout)
+        if match:
+            return match.group(1)
+            
+    except Exception as e:
+        print(f"Error getting IP for {interface}: {e}")
+    
+    # Fallback: try the old method
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         local_ip = s.getsockname()[0]
-    except Exception:
-        local_ip = "127.0.0.1"
-    finally:
         s.close()
-    return local_ip
+        return local_ip
+    except Exception:
+        return "127.0.0.1"
 
 
-def get_network_range() -> str:
-    """Get the network range based on local IP (assumes /24 subnet)"""
-    local_ip = get_local_ip()
+def get_network_range(interface: str = "wlan0") -> str:
+    """Get the network range based on local IP for a specific interface (assumes /24 subnet)
+    
+    Args:
+        interface: Network interface name (default: "wlan0")
+        
+    Returns:
+        Network range string (e.g., "192.168.1.0/24")
+    """
+    local_ip = get_local_ip(interface)
     network = ipaddress.IPv4Network(f"{local_ip}/24", strict=False)
     return str(network)
 
