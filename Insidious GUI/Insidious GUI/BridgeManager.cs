@@ -202,11 +202,19 @@ namespace Insidious_GUI
                 {
                     try
                     {
+                        System.Diagnostics.Debug.WriteLine($"[Bridge] Raw JSON: {messageJson}");
+                        
                         var message = JsonSerializer.Deserialize<Message>(messageJson);
+                        
+                        System.Diagnostics.Debug.WriteLine($"[Bridge] Parsed: module={message.module}, action={message.action}, type={message.type}");
+                        System.Diagnostics.Debug.WriteLine($"[Bridge] Data type: {message.data?.GetType()}");
+                        System.Diagnostics.Debug.WriteLine($"[Bridge] Data value: {message.data}");
+                        
                         HandleReceivedMessage(message);
                     }
                     catch (Exception ex)
                     {
+                        System.Diagnostics.Debug.WriteLine($"[Bridge] Parse error: {ex.Message}");
                         Console.WriteLine($"Failed to parse message: {ex.Message}");
                     }
                 }
@@ -221,7 +229,7 @@ namespace Insidious_GUI
         /// </summary>
         private void HandleReceivedMessage(Message message)
         {
-            Console.WriteLine($"Received: {message.module}.{message.action} ({message.type})");
+            System.Diagnostics.Debug.WriteLine($"Received: {message.module}.{message.action} ({message.type})");
 
             // Check if this is a response to a pending request
             if (message.type == "RESP" && !string.IsNullOrEmpty(message.msg_id))
