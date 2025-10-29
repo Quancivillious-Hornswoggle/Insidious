@@ -30,6 +30,12 @@ namespace Insidious_GUI
         public object data { get; set; }
         public string msg_id { get; set; }
 
+        // Parameterless constructor for deserialization
+        public Message()
+        {
+        }
+
+        // Constructor for creating new messages
         public Message(MessageType msgType, string module, string action, object data = null)
         {
             this.type = msgType.ToString();
