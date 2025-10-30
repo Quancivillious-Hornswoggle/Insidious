@@ -61,6 +61,7 @@ namespace Insidious_GUI
         public event EventHandler<MessageReceivedEventArgs> ResponseReceived;
         public event EventHandler<MessageReceivedEventArgs> EventReceived;
         public event EventHandler<MessageReceivedEventArgs> ErrorReceived;
+        public event EventHandler<MessageSentEventArgs> CommandSent;
 
         // Pending response handlers (for request-response pattern)
         private Dictionary<string, TaskCompletionSource<Message>> pendingResponses = 
@@ -128,7 +129,10 @@ namespace Insidious_GUI
             await stream.WriteAsync(buffer, 0, buffer.Length);
             await stream.FlushAsync();
 
-            Console.WriteLine($"Sent: {module}.{action}");
+            // Fire command sent event
+            CommandSent?.Invoke(this, new MessageSentEventArgs(message));
+
+            System.Diagnostics.Debug.WriteLine($"Sent: {module}.{action}");
 
             // Wait for response if requested
             if (waitForResponse)
@@ -294,6 +298,19 @@ namespace Insidious_GUI
         public Message Message { get; }
 
         public MessageReceivedEventArgs(Message message)
+        {
+            Message = message;
+        }
+    }
+
+    /// <summary>
+    /// Event args for message sent events
+    /// </summary>
+    public class MessageSentEventArgs : EventArgs
+    {
+        public Message Message { get; }
+
+        public MessageSentEventArgs(Message message)
         {
             Message = message;
         }

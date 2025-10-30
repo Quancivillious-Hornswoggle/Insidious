@@ -19,27 +19,34 @@ namespace Insidious_GUI
 
         private async void Form1_Load(object sender, EventArgs e)
         {
+            // Make console read-only and enable scrolling
+            consoleTextBox.ReadOnly = true;
+            consoleTextBox.ScrollBars = ScrollBars.Vertical;
+            consoleTextBox.WordWrap = true;
+            
             // Initialize bridge manager
-            Debug.WriteLine("Initializing Bridge Manager");
+            LogToConsole("[System] Initializing Bridge Manager...");
             Bridge = new BridgeManager();
 
-            // Subscribe to global events (optional - for debugging/logging)
+            // Subscribe to global events
             Bridge.EventReceived += Bridge_EventReceived;
             Bridge.ErrorReceived += Bridge_ErrorReceived;
+            Bridge.ResponseReceived += Bridge_ResponseReceived;
+            Bridge.CommandSent += Bridge_CommandSent;
 
             // Try to connect
-            Debug.WriteLine("Connecting to Python bridge...");
+            LogToConsole("[System] Connecting to Python bridge...");
             
             bool connected = await Bridge.ConnectAsync("127.0.0.1", 65535, retries: 10);
             
             if (connected)
             {
-                Debug.WriteLine("Connected successfully!");
+                LogToConsole("[System] ✓ Connected successfully!");
                 this.Text = "Insidious - Connected";
             }
             else
             {
-                Debug.WriteLine("Connection failed!");
+                LogToConsole("[System] ✗ Connection failed!");
                 this.Text = "Insidious - Connection Failed";
                 MessageBox.Show(
                     "Failed to connect to Python bridge. Make sure python_bridge.py is running.",
@@ -50,16 +57,24 @@ namespace Insidious_GUI
             }
         }
 
+        private void Bridge_CommandSent(object sender, MessageSentEventArgs e)
+        {
+            LogToConsole($"[→ CMD] {e.Message.module}.{e.Message.action}");
+        }
+
+        private void Bridge_ResponseReceived(object sender, MessageReceivedEventArgs e)
+        {
+            LogToConsole($"[← RESP] {e.Message.module}.{e.Message.action}");
+        }
+
         private void Bridge_EventReceived(object sender, MessageReceivedEventArgs e)
         {
-            // Global event handler - could log all events
-            Debug.WriteLine($"[EVENT] {e.Message.module}.{e.Message.action}");
+            LogToConsole($"[← EVENT] {e.Message.module}.{e.Message.action}");
         }
 
         private void Bridge_ErrorReceived(object sender, MessageReceivedEventArgs e)
         {
-            // Global error handler
-            Debug.WriteLine($"[ERROR] {e.Message.module}: {e.Message.data}");
+            LogToConsole($"[← ERROR] {e.Message.module}.{e.Message.action}");
             
             // Show error to user
             if (InvokeRequired)
@@ -70,6 +85,22 @@ namespace Insidious_GUI
             {
                 ShowError(e.Message);
             }
+        }
+
+        private void LogToConsole(string message)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => LogToConsole(message)));
+                return;
+            }
+
+            string timestamp = DateTime.Now.ToString("HH:mm:ss");
+            consoleTextBox.AppendText($"[{timestamp}] {message}\r\n");
+            
+            // Auto-scroll to bottom
+            consoleTextBox.SelectionStart = consoleTextBox.Text.Length;
+            consoleTextBox.ScrollToCaret();
         }
 
         private void ShowError(Message message)
