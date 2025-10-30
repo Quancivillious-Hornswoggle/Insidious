@@ -45,7 +45,7 @@ class DNSModule(BaseModule):
         self.domain_spoof_list = message.data.get("spoof_targets")
         self.is_spoofing = True
 
-        print(f"[{self.module_name}] Spoofed target address: {self.target_address}")
+        print(f"[{self.module_name}] Spoofed target address: {self.domain_spoof_list}")
         spoof_thread = threading.Thread(target=self._spoof_selected, daemon=True)
         spoof_thread.start()
 

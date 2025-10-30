@@ -71,7 +71,7 @@ namespace Insidious_GUI.ModuleWindows
             if (forwardAddressTextBox.Text.Length == 0 || forwardAddressTextBox.Text == string.Empty || forwardAddressTextBox.Text == null)
                 MessageBox.Show("You did not type in an IP to forward to.", "Error");
 
-            await Form1.Bridge.SendCommandAsync("dns", "spoof_selected", new { target_ip = forwardAddressTextBox.Text, spoof_targets = addressCheckedListBox.Items });
+            await Form1.Bridge.SendCommandAsync("dns", "spoof_selected", new { target_ip = forwardAddressTextBox.Text, spoof_targets = addressCheckedListBox.CheckedItems });
         }
 
         private async void forwardAllButton_Click(object sender, EventArgs e)
