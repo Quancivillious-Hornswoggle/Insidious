@@ -110,6 +110,15 @@ def main(ss, ms):
             print(f"    ✗ mitm import failed: {e}")
             import traceback
             traceback.print_exc()
+
+        try:
+            from Modules import server
+            print("    ✓ server imported")
+        except Exception as e:
+            print(f"    ✗ server import failed: {e}")
+            import traceback
+            traceback.print_exc()
+
         
         # STEP 3: Create module instances (this registers them)
         print("\n[3] Creating module instances...")
@@ -129,6 +138,15 @@ def main(ss, ms):
             print(f"    ✓ mitm module created: {mitm_mod.module_name}")
         except Exception as e:
             print(f"    ✗ Failed to create mitm module: {e}")
+            import traceback
+            traceback.print_exc()
+
+        try:
+            server_mod = server.get_module()
+            modules['server'] = server_mod
+            print(f"    ✓ server module created: {server_mod.module_name}")
+        except Exception as e:
+            print(f"    ✗ Failed to create server module: {e}")
             import traceback
             traceback.print_exc()
         
