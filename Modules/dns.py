@@ -54,7 +54,7 @@ class DNSModule(BaseModule):
 
                     # Send multiple times for reliability
                     for _ in range(3):
-                        send(response, verbose=0)
+                        send(response, verbose=0, iface=iface.ADAPTER_NAME)
 
                     print(f"[{self.module_name}] Spoofed DNS query for {query_name} -> {self.target_address}")
         except Exception as e:
