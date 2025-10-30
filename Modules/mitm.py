@@ -146,14 +146,14 @@ class MitmModule(BaseModule):
         }
 
     def handle_dos(self, message: Message):
-        subprocess.run(["sysctl", "net.ipv4.ip_forward"], check=False)
+        subprocess.run(["sudo", "sysctl", "net.ipv4.ip_forward", "0"])
 
         return {
             "status" : "toggled_dos"
         }
 
     def handle_passthrough(self, message: Message):
-        subprocess.run(["sysctl", "net.ipv4.ip_forward"], check=True)
+        subprocess.run(["sudo", "sysctl", "net.ipv4.ip_forward", "1"])
 
         return {
             "status" : "toggled_passthrough"

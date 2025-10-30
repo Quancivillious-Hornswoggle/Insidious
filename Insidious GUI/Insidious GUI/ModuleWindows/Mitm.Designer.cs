@@ -116,6 +116,7 @@
             doSButton.TabIndex = 8;
             doSButton.Text = "DDOS";
             doSButton.UseVisualStyleBackColor = false;
+            doSButton.Click += doSButton_Click;
             // 
             // packetPassthroughButton
             // 
@@ -129,6 +130,7 @@
             packetPassthroughButton.TabIndex = 9;
             packetPassthroughButton.Text = "Packet Passthrough";
             packetPassthroughButton.UseVisualStyleBackColor = false;
+            packetPassthroughButton.Click += packetPassthroughButton_Click;
             // 
             // Mitm
             // 
@@ -149,6 +151,7 @@
             Name = "Mitm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Mitm";
+            //Load += this.Mitm_Load;
             ResumeLayout(false);
         }
 
