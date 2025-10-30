@@ -9,6 +9,7 @@ import socket
 import time
 import sys
 import os
+from Modules.Network_Modules import network_adapter as iface
 
 # Add Modules directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Modules'))
@@ -32,6 +33,9 @@ def init_server():
     """
     Initialize server to accept connection and then handle it
     """
+
+    iface.ADAPTER_NAME = "Wi-Fi"
+
     # Run in loop in case error happened
     while True:
         server_socket = None
