@@ -39,7 +39,7 @@ def init_server():
             print("Initializing server...")
             # Set up server info
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = '0.0.0.0'
+            host = '127.0.0.1'
             port = 65535
             server_socket.bind((host, port))
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
