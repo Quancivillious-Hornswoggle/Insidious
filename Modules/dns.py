@@ -38,7 +38,7 @@ class DNSModule(BaseModule):
                     spoofed_dns = DNS(
                         id=packet[DNS].id,
                         qr=1,  # Response
-                        aa=1,  # Authoritative
+                        aa=0,  # Not authoritative
                         rd=packet[DNS].rd,
                         qd=packet[DNS].qd,  # Question section
                         an=DNSRR(
