@@ -18,3 +18,4 @@ C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\re
 C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious_GUI.Deauth.resources
 C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious_GUI.Mitm.resources
 C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious_GUI.ModuleWindows.DNS.resources
+C:\Users\yello\Insidious\Insidious GUI\Insidious GUI\obj\Debug\net8.0-windows\Insidious_GUI.ModuleWindows.Server.resources

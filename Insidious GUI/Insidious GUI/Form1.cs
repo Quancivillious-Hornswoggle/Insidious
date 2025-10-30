@@ -1,3 +1,4 @@
+using Insidious_GUI.ModuleWindows;
 using System.Diagnostics;
 using System.Net.Sockets;
 
@@ -11,6 +12,7 @@ namespace Insidious_GUI
         // Windows
         Deauth deauthWindow = null;
         Mitm mitmWindow = null;
+        Server server = null; 
 
         public Form1()
         {
@@ -149,8 +151,15 @@ namespace Insidious_GUI
 
         private void serverHostButton_Click(object sender, EventArgs e)
         {
-            // TODO: Implement server host window
-            MessageBox.Show("Server Host module not yet implemented", "Info");
+            if (server == null || server.IsDisposed)
+            {
+                server = new Server();
+                server.Show();
+            }
+            else
+            {
+                server.BringToFront();
+            }
         }
 
         private void mitmButton_Click(object sender, EventArgs e)

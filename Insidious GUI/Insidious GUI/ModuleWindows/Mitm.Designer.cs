@@ -151,7 +151,6 @@
             Name = "Mitm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Mitm";
-            //Load += this.Mitm_Load;
             ResumeLayout(false);
         }
 

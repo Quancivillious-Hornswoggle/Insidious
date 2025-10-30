@@ -273,7 +273,7 @@ class MitmModule(BaseModule):
     def stop_poisoning(self):
         """Internal method to stop poisoning"""
         self.is_poisoning = False
-        subprocess.run(["sysctl", "net.ipv4.ip_forward"], check=False)
+        subprocess.run(["sudo", "sysctl", "-w", "net.ipv4.ip_forward=0"], check=True)
     
     def handle_get_status(self, message: Message):
         """Get current module status"""
@@ -302,11 +302,6 @@ class MitmModule(BaseModule):
         except Exception as e:
             print(f"[{self.module_name}] Scan error: {e}")
             self.send_event("scan_error", {"error": str(e)})
-
-# Initialize module (called by bridge)
-def init(host_socket):
-    """Legacy init function - now handled by bridge"""
-    pass
 
 # Global instance
 _module = None

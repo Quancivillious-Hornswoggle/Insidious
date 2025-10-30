@@ -67,7 +67,7 @@
             label1.ForeColor = Color.WhiteSmoke;
             label1.Location = new Point(0, 0);
             label1.Name = "label1";
-            label1.Size = new Size(207, 40);
+            label1.Size = new Size(297, 50);
             label1.TabIndex = 1;
             label1.Text = "Address to Spoof";
             // 

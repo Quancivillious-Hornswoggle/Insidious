@@ -44,18 +44,6 @@ class DNSModule(BaseModule):
     def stop_spoofing(self):
         pass
 
-
-
-
-
-
-
-
-# Initialize module (called by bridge)
-def init(host_socket):
-    """Legacy init function - now handled by bridge"""
-    pass
-
 # Global instance
 _module = None
 

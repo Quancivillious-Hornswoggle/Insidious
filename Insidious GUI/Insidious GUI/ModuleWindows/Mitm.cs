@@ -147,6 +147,9 @@ namespace Insidious_GUI
             if (!isPoisoning) return;
             await Form1.Bridge.SendCommandAsync("mitm", "stop");
             isPoisoning = false;
+
+            doSButton.Enabled = false;
+            packetPassthroughButton.Enabled = true;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
