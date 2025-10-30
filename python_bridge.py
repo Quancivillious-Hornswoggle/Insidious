@@ -112,7 +112,7 @@ def main(ss, ms):
             traceback.print_exc()
 
         try:
-            from Modules import server
+            from Modules import dns
             print("    ✓ server imported")
         except Exception as e:
             print(f"    ✗ server import failed: {e}")
@@ -142,9 +142,9 @@ def main(ss, ms):
             traceback.print_exc()
 
         try:
-            server_mod = server.get_module()
-            modules['server'] = server_mod
-            print(f"    ✓ server module created: {server_mod.module_name}")
+            dns_mod = dns.get_module()
+            modules['server'] = dns_mod
+            print(f"    ✓ server module created: {dns_mod.module_name}")
         except Exception as e:
             print(f"    ✗ Failed to create server module: {e}")
             import traceback
