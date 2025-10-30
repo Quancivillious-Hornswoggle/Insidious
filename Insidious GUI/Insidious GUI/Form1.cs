@@ -1,5 +1,6 @@
 using Insidious_GUI.ModuleWindows;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Insidious_GUI
@@ -12,6 +13,7 @@ namespace Insidious_GUI
         // Windows
         Deauth deauthWindow = null;
         Mitm mitmWindow = null;
+        DNS dns = null;
         Server server = null; 
 
         public Form1()
@@ -145,8 +147,15 @@ namespace Insidious_GUI
 
         private void dnsSpoofButton_Click(object sender, EventArgs e)
         {
-            // TODO: Implement DNS spoof window
-            MessageBox.Show("DNS Spoof module not yet implemented", "Info");
+            if (dns == null || dns.IsDisposed)
+            {
+                dns = new DNS();
+                dns.Show();
+            }
+            else
+            {
+                dns.BringToFront();
+            }
         }
 
         private void serverHostButton_Click(object sender, EventArgs e)

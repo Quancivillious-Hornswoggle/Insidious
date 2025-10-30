@@ -32,6 +32,8 @@
             startServerButton = new Button();
             stopServerButton = new Button();
             folderBrowserDialog = new FolderBrowserDialog();
+            label1 = new Label();
+            addressLabel = new Label();
             SuspendLayout();
             // 
             // startServerButton
@@ -62,12 +64,33 @@
             stopServerButton.UseVisualStyleBackColor = false;
             stopServerButton.Click += stopServerButton_Click;
             // 
+            // label1
+            // 
+            label1.ForeColor = Color.WhiteSmoke;
+            label1.Location = new Point(12, 89);
+            label1.Name = "label1";
+            label1.Size = new Size(318, 69);
+            label1.TabIndex = 8;
+            label1.Text = "IP Address of Website -------------------------------------------";
+            label1.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // addressLabel
+            // 
+            addressLabel.ForeColor = Color.WhiteSmoke;
+            addressLabel.Location = new Point(12, 148);
+            addressLabel.Name = "addressLabel";
+            addressLabel.Size = new Size(318, 40);
+            addressLabel.TabIndex = 9;
+            addressLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // Server
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Black;
-            ClientSize = new Size(342, 96);
+            ClientSize = new Size(342, 204);
+            Controls.Add(addressLabel);
+            Controls.Add(label1);
             Controls.Add(stopServerButton);
             Controls.Add(startServerButton);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -76,7 +99,6 @@
             Name = "Server";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Web Server Hoster";
-            FormClosing += Server_FormClosing;
             Load += Server_Load;
             ResumeLayout(false);
         }
@@ -86,5 +108,7 @@
         private Button startServerButton;
         private Button stopServerButton;
         private FolderBrowserDialog folderBrowserDialog;
+        private Label label1;
+        private Label addressLabel;
     }
 }
