@@ -46,9 +46,8 @@ class MitmModule(BaseModule):
         # Register command handlers
         self.register_handler("poison_all", self.handle_poison_all)
         self.register_handler("poison_selected", self.handle_poison_selected)
-        self.register_handler("dos", self.handle_get_status)
+        self.register_handler("dos", self.handle_dos)
         self.register_handler("passthrough", self.handle_passthrough)
-        self.register_handler("restore", self.handle_restore)
         self.register_handler("get_status", self.handle_get_status)
         self.register_handler("stop", self.handle_stop_poison)
         self.register_handler("scan", self.handle_scan)
@@ -147,35 +146,18 @@ class MitmModule(BaseModule):
         }
 
     def handle_dos(self, message: Message):
-        self.target_ip = message.data.get("target_ip")
-
-        if not self.target_ip:
-            return {
-                "status": "error",
-                "message": "Target IP required"
-            }
-
-        if self.is_poisoning:
-            return {"status": "error", "message": "Attack already in progress"}
-
-        # Ensure managed mode
-        if iface.ADAPTER_STATUS == "monitor":
-            iface.set_adapter_status("managed")
-            self.send_event("status_update", {"status": "adapter_mode_changed", "mode": "managed"})
-
-        # Start poisoning
-        self.is_poisoning = True
-        self.packets_captured = 0
-
-        poison_thread = threading.Thread(target=self._poison_worker, daemon=True)
-        poison_thread.start()
+        subprocess.run(["sysctl", "net.ipv4.ip_forward"], check=False)
 
         return {
-            "status": "attack_started",
+            "status" : "toggled_dos"
         }
 
     def handle_passthrough(self, message: Message):
-        pass
+        subprocess.run(["sysctl", "net.ipv4.ip_forward"], check=True)
+
+        return {
+            "status" : "toggled_passthrough"
+        }
 
     def handle_restore(self, message: Message):
         pass
@@ -309,7 +291,7 @@ class MitmModule(BaseModule):
     def stop_poisoning(self):
         """Internal method to stop poisoning"""
         self.is_poisoning = False
-        # TODO: Send ARP packets to restore normal operation
+        subprocess.run(["sysctl", "net.ipv4.ip_forward"], check=False)
     
     def handle_get_status(self, message: Message):
         """Get current module status"""
@@ -317,7 +299,6 @@ class MitmModule(BaseModule):
             "is_poisoning": self.is_poisoning,
             "target_ip": self.target_ip,
             "gateway_ip": self.gateway_ip,
-            "packets_captured": self.packets_captured,
             "adapter_mode": iface.ADAPTER_STATUS
         }
 
